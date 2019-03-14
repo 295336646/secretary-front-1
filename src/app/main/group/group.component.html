@@ -1,3 +1,43 @@
-<p>
-  group works!
-</p>
+<div class="container">
+  <div>
+    <tabset>
+      <tab *ngFor="let group of groups" heading={{group}}>
+        <button class="btn btn-success">选择教师</button>
+        <p>教师：</p>
+      </tab>
+    </tabset>
+  </div>
+  <table class="table table-bordered table-hover" style="width: 90%">
+    <thead>
+    <tr>
+      <th>所属班级</th>
+      <th>学生学号</th>
+      <th>学生姓名</th>
+      <th>教师工号</th>
+      <th>教师姓名</th>
+      <th>课题名称</th>
+      <th>评阅教师工号</th>
+      <th>评阅教师姓名</th>
+      <th>组号</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let stu of list">
+      <td>{{stu.sclass}}</td>
+      <td>{{stu.sid}}</td>
+      <td>{{stu.sname}}</td>
+      <td>{{stu.teacher.tid}}</td>
+      <td>{{stu.teacher.tname}}</td>
+      <td>{{stu.course.cname}}</td>
+      <td>{{stu.judge.teacher.tid}}</td>
+      <td>{{stu.judge.teacher.tname}}</td>
+      <td>
+        <span *ngIf=stu.sgroup>
+          {{stu.sgroup}}组
+        </span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+

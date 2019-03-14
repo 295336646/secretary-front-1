@@ -1,3 +1,68 @@
-<p>
-  main works!
-</p>
+<!--页面加载条-->
+<!--loading为true则显示，反之隐藏-->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
+<!--整体div-->
+<div class="wrap">
+  <!-- 左边内容 -->
+  <div id="left" class="left">
+    <!--显示标题-->
+    <div id="logoDiv" class="logoDiv">
+      <p id="logoTitle" class="logoTitle">
+        <span style="font-size:18px;">毕业设计-秘书端</span>
+      </p>
+    </div>
+    <!--显示用户信息-->
+    <div class="menu-title" id="personInfor">
+      <!--用户标签-->
+      <span class="glyphicon glyphicon-user" style="font-size: 20px">
+        <span style="margin-left: 10px">{{name}}</span>
+      </span>
+      <br><br>
+      <button class="btn btn-primary btn-sm" (click)="logout()">退出登录</button>
+    </div>
+
+    <hr>
+    <br>
+
+    <div class="menu-title">秘书管理</div>
+    <!--选项卡1-->
+    <div class="menu-item menu-item-active" href="#one" data-toggle="tab">
+      －成绩管理
+    </div>
+    <!--选项卡2-->
+    <div class="menu-item" href="#two" data-toggle="tab" (click)="showFiles()">
+      －文件管理
+    </div>
+    <!--选项卡3-->
+    <div class="menu-item" href="#three" data-toggle="tab">
+      －分组管理
+    </div>
+    <!--选项卡4-->
+    <div class="menu-item" href="#four" data-toggle="tab">
+      －修改密码
+    </div>
+  </div>
+
+  <!-- 右边内容 -->
+  <div id="right" class="tab-content right">
+    <!--默认激活内容-->
+    <div id="one" class="tab-pane active">
+      <app-secretary></app-secretary>
+    </div>
+    <!--待激活内容-->
+    <div id="two" class="tab-pane">
+                             <span style="text-shadow: 2px 0px 6px">
+                               <app-file [user]="user" [users]="users"></app-file>
+                            </span>
+    </div>
+    <div id="three" class="tab-pane">
+      <app-group></app-group>
+    </div>
+    <!--待激活内容-->
+    <div id="four" class="tab-pane">
+      <app-update [user]="user"></app-update>
+    </div>
+  </div>
+
+</div>
+

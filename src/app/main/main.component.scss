@@ -1,0 +1,83 @@
+// 整体布局
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Lato, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.72222;
+  color: #34495e;
+  background-color: #fff;
+}
+
+// div整体调整
+.wrap {
+  min-width: 100%;
+  position: absolute;
+  background: #eff3f6 bottom;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+// 左边div布局
+.left {
+  margin-left: 0px;
+  position: absolute;
+  box-sizing: border-box;
+  width: 200px;
+  height: 100%;
+  background: #4d5e70 bottom;
+}
+
+.logoDiv {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  height: 70px;
+  background-color: #354457;
+  font-size: 17px;
+  color: #fff;
+  vertical-align: bottom;
+}
+
+// 标题布局
+.logoTitle {
+  margin-left: 15px;
+  line-height: 1.7;
+}
+
+// 选项标题
+.menu-title {
+  margin-left: 15px;
+  color: #828e9a;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+//未选中的初始状态
+.menu-item {
+  padding-left: 15px;
+  line-height: 40px;
+  height: 40px;
+  color: #aab1b7;
+  cursor: pointer;
+}
+
+// 选中状态
+.menu-item-active {
+  background-color: #3d4e60;
+  border-right: 4px solid #647f9d;
+  color: #fff;
+}
+
+// 右边div布局
+.right {
+  float: left;
+  box-sizing: border-box;
+  padding-left: 200px;
+  clear: both;
+  color: #717592;
+  min-width: 100%;
+  min-height: 500px;
+}
+

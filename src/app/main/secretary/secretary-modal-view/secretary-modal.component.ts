@@ -16,7 +16,7 @@ export class SecretaryModalComponent implements OnInit {
     keyboard: false
   };
 
-  constructor(public modalService: BsModalService) {
+  constructor(private modalService: BsModalService) {
   }
 
   ngOnInit() {
