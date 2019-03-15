@@ -1,3 +1,54 @@
-<p>
-  student works!
-</p>
+<button class="btn btn-primary btn-sm" (click)="openModal(template)">选择学生</button>
+<br>
+<label>
+  学生：
+</label>
+<span *ngFor="let student of checkStudents;let i =index">
+          <span *ngIf="i===0">{{student.sname}}</span>
+          <span *ngIf="i!==0" style="padding-left: 42px">{{student.sname}}</span>
+          <button class="btn btn-default btn-xs" (click)="remove(student)">
+             <span class="glyphicon glyphicon-remove"></span>
+          </button>
+          <br>
+</span>
+<br *ngIf="!checkStudents.length">
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">学生表</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="decline()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="input-group form-group">
+      <input type="text" class="form-control" ngModel #search>
+      <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+    </div>
+    <table class="table table-bordered table-hover" style="width: 90%">
+      <thead>
+      <tr>
+        <th>
+          <input type="checkbox" id="check_all" (click)="checkAll()">
+        </th>
+        <th>学号</th>
+        <th>学生姓名</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let student of students | filter : 'sid':search.value"
+          (click)="checkLine($event)">
+        <td>
+          <input type="checkbox" class="check_item" (click)="checkItem($event)" name="{{student.sname}}"
+                 [checked]="false" id="{{student.sid}}">
+        </td>
+        <td>{{student.sid}}</td>
+        <td>{{student.sname}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="confirm($event)">确认</button>
+    <button class="btn btn-primary" (click)="decline()">关闭</button>
+  </div>
+</ng-template>

@@ -2,7 +2,10 @@
   <div>
     <tabset>
       <tab *ngFor="let group of groups" heading={{group}}>
-        <app-teacher></app-teacher>
+        <app-teacher [teacherFlag]="teacherFlag" #teacher></app-teacher>
+        <app-student #student></app-student>
+        <app-teacher [teacherFlag]="!teacherFlag" #judge></app-teacher>
+        <button class="btn btn-success" (click)="submit()">提交</button>
       </tab>
     </tabset>
   </div>

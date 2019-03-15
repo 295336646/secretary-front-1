@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef} from '@angular/core';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import * as $ from 'jquery';
 import {HttpService} from '../../../service/http.service';
@@ -16,8 +16,12 @@ export class TeacherComponent implements OnInit {
     backdrop: 'static',
     keyboard: false
   };
-  teachers: Array<Teacher> = new Array<Teacher>();
-  tname: Array<string> = new Array<string>();
+  @Input() teacherFlag: string;
+  teachers: Array<Teacher>;
+  // tname: Array<string> = new Array<string>();
+  // tid: Array<string> = new Array<string>();
+  checkTeachers: Array<Teacher> = new Array<Teacher>();
+  teacher: Teacher;
 
   constructor(private modalService: BsModalService, private http: HttpService) {
   }
@@ -37,9 +41,12 @@ export class TeacherComponent implements OnInit {
   }
 
   confirm(e: any): void {
-    this.tname.length = 0;
+    this.checkTeachers.length = 0;
     for (let i = 0; i < $('.check_item:checked').length; i++) {
-      this.tname.push($('.check_item:checked').eq(i).attr('name'));
+      this.teacher = new Teacher();
+      this.teacher.tid = $('.check_item:checked').eq(i).attr('id');
+      this.teacher.tname = $('.check_item:checked').eq(i).attr('name');
+      this.checkTeachers.push(this.teacher);
     }
     this.decline();
   }
@@ -58,17 +65,11 @@ export class TeacherComponent implements OnInit {
     e.target.parentNode.firstChild.firstChild.checked = !e.target.parentNode.firstChild.firstChild.checked;
   }
 
-  remove(name: string) {
-    // 第一种方式：较为简单
-    /*  this.tname.forEach((tname: string, index, array) => {
-        if (tname === name) {
-          array.splice(index, 1);
-        }
-      });*/
-    // 第二种方式：进阶
+  remove(checkTeacher: Teacher) {
     // filter方法返回数组
-    this.tname = this.tname.filter((item: string) => {
-      return item !== name;
-    });
+    this.checkTeachers = this.checkTeachers.filter((teacher: Teacher) => {
+        return teacher !== checkTeacher;
+      }
+    );
   }
 }
