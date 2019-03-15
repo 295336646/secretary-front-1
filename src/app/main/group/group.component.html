@@ -2,8 +2,7 @@
   <div>
     <tabset>
       <tab *ngFor="let group of groups" heading={{group}}>
-        <button class="btn btn-success">选择教师</button>
-        <p>教师：</p>
+        <app-teacher></app-teacher>
       </tab>
     </tabset>
   </div>

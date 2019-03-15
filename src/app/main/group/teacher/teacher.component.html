@@ -1,0 +1,54 @@
+<button class="btn btn-primary btn-sm" (click)="openModal(template)">选择教师</button>
+<br>
+<span>
+  教师：
+</span>
+<span *ngFor="let name of tname;let i =index">
+          <span *ngIf="i===0">{{name}}</span>
+          <span *ngIf="i!==0" style="padding-left: 45px">{{name}}</span>
+          <button class="btn btn-default btn-xs" (click)="remove(name)">
+             <span class="glyphicon glyphicon-remove"></span>
+          </button>
+          <br>
+</span>
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">教师表</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="decline()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="input-group form-group">
+      <input type="text" class="form-control" ngModel #search>
+      <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+    </div>
+    <table class="table table-bordered table-hover" style="width: 90%">
+      <thead>
+      <tr>
+        <th>
+          <input type="checkbox" id="check_all" (click)="checkAll()">
+        </th>
+        <th>教工号</th>
+        <th>教师姓名</th>
+        <th>组号</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let teacher of teachers | filter : 'tid':search.value"
+          (click)="checkLine($event)">
+        <td>
+          <input type="checkbox" class="check_item" (click)="checkItem($event)" name="{{teacher.tname}}" [checked]="false">
+        </td>
+        <td>{{teacher.tid}}</td>
+        <td>{{teacher.tname}}</td>
+        <td>{{teacher.tgroup}}组</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="confirm($event)">确认</button>
+    <button class="btn btn-primary" (click)="decline()">关闭</button>
+  </div>
+</ng-template>

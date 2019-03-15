@@ -25,6 +25,7 @@ import {ProgressbarModule} from 'ngx-bootstrap';
 import {FileService} from './service/file.service';
 import { GroupComponent } from './main/group/group.component';
 import { TeacherComponent } from './main/group/teacher/teacher.component';
+import { StudentComponent } from './main/group/student/student.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { TeacherComponent } from './main/group/teacher/teacher.component';
     SecretaryModalComponent,
     GroupComponent,
     TeacherComponent,
+    StudentComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, TemplateRef} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef} from '@angular/core';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {Secretary} from '../secretary';
 

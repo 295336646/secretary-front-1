@@ -5,10 +5,9 @@ import {Pipe, PipeTransform} from '@angular/core';
 })
 export class FilterPipe implements PipeTransform {
   // 查询管道
-  transform(products: any[], filter: string, keyword: string): any {
-    return products.filter(product => {
-      return product[filter].indexOf(keyword) >= 0;
+  transform(items: Array<any>, filter: string, keyword: string): any {
+    return items.filter(item => {
+      return item[filter].indexOf(keyword) >= 0;
     });
   }
-
 }

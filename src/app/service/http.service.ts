@@ -49,4 +49,14 @@ export class HttpService {
   groupAll(): Observable<any> {
     return this.http.get(`${this.Url}/groupAll`).pipe(catchError(this.config.handleError));
   }
+
+  // 老师
+  showTeachers(): Observable<any> {
+    return this.http.get(`${this.Url}/showTeachers`).pipe(catchError(this.config.handleError));
+  }
+
+  // 学生
+  showStudents(): Observable<any> {
+    return this.http.get(`${this.Url}/showStudents`).pipe(catchError(this.config.handleError));
+  }
 }

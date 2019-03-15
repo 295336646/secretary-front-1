@@ -1,5 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {HttpService} from '../../service/http.service';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-group',
@@ -19,5 +20,4 @@ export class GroupComponent implements OnInit {
       this.list = result;
     });
   }
-
 }
