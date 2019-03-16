@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, TemplateRef} from '@angular/core';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {HttpService} from '../../../service/http.service';
 import {Student} from './student';
@@ -19,7 +19,8 @@ export class StudentComponent implements OnInit {
   };
   students: Array<Student>;
   checkStudents: Array<Student> = new Array<Student>();
-  student: Student;
+  @Output() outer = new EventEmitter();
+
   constructor(private modalService: BsModalService, private http: HttpService) {
   }
 
@@ -40,11 +41,12 @@ export class StudentComponent implements OnInit {
   confirm(e: any): void {
     this.checkStudents.length = 0;
     for (let i = 0; i < $('.check_item:checked').length; i++) {
-      this.student = new Student();
-      this.student.sid = $('.check_item:checked').eq(i).attr('id');
-      this.student.sname = $('.check_item:checked').eq(i).attr('name');
-      this.checkStudents.push(this.student);
+      const student = new Student();
+      student.sid = $('.check_item:checked').eq(i).attr('id');
+      student.sname = $('.check_item:checked').eq(i).attr('name');
+      this.checkStudents.push(student);
     }
+    this.outer.emit(this.checkStudents);
     this.decline();
   }
 

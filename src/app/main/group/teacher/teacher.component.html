@@ -1,19 +1,17 @@
 <button class="btn btn-primary btn-sm" (click)="openModal(template)">选择教师</button>
 <br>
 <label>
-  {{teacherFlag?'教师':'评阅教师'}}：
+  教师:
 </label>
-<span *ngFor="let teacher of checkTeachers;let i =index">
-          <span *ngIf="i===0">{{teacher.tname}}</span>
-          <span *ngIf="i!==0&&teacherFlag" style="padding-left: 42px">{{teacher.tname}}</span>
-          <span *ngIf="i!==0&&!teacherFlag" style="padding-left: 70px">{{teacher.tname}}</span>
-          <button class="btn btn-default btn-xs" (click)="remove(teacher)">
-             <span class="glyphicon glyphicon-remove"></span>
-          </button>
-          <br>
+<span *ngIf="checkTeacher">
+  <span>{{checkTeacher.tname}}</span>
+  <button class="btn btn-default btn-xs" (click)="remove()">
+    <span class="glyphicon glyphicon-remove"></span>
+  </button>
+  <br>
 </span>
 
-<br *ngIf="!checkTeachers.length">
+<br *ngIf="!checkTeacher">
 <ng-template #template>
   <div class="modal-header">
     <h4 class="modal-title text-center">教师表</h4>
@@ -30,7 +28,7 @@
       <thead>
       <tr>
         <th>
-          <input type="checkbox" id="check_all" (click)="checkAll()">
+          #
         </th>
         <th>教工号</th>
         <th>教师姓名</th>
@@ -40,8 +38,8 @@
       <tr *ngFor="let teacher of teachers | filter : 'tid':search.value"
           (click)="checkLine($event)">
         <td>
-          <input type="checkbox" class="check_item" (click)="checkItem($event)" name="{{teacher.tname}}"
-                 id="{{teacher.tid}}" [checked]="false">
+          <input type="radio" class="{{teacher.tname}}" name="teacher"
+                 id="{{teacher.tid}}" [checked]="false" (click)="$event.stopPropagation()">
         </td>
         <td>{{teacher.tid}}</td>
         <td>{{teacher.tname}}</td>

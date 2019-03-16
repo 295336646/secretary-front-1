@@ -47,7 +47,7 @@
   <div id="right" class="tab-content right">
     <!--默认激活内容-->
     <div id="one" class="tab-pane active">
-      <app-secretary></app-secretary>
+      <app-secretary [user]="user"></app-secretary>
     </div>
     <!--待激活内容-->
     <div id="two" class="tab-pane">
@@ -56,7 +56,7 @@
                             </span>
     </div>
     <div id="three" class="tab-pane">
-      <app-group></app-group>
+      <app-group [user]="user"></app-group>
     </div>
     <!--待激活内容-->
     <div id="four" class="tab-pane">

@@ -1,9 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import * as $ from 'jquery';
 import {saveAs} from 'file-saver';
 import {HttpService} from '../../service/http.service';
 import {Secretary} from './secretary';
 import {FileService} from '../../service/file.service';
+import {User} from '../../home/user';
 
 @Component({
   selector: 'app-secretary',
@@ -17,6 +18,7 @@ export class SecretaryComponent implements OnInit, OnDestroy {
   today: Date;
   texts: string; // 保存初始span里面的值
   total: string;
+  @Input() user: User;
 
   constructor(private http: HttpService, private fileService: FileService) {
     this.timer = setInterval(() => {
@@ -90,7 +92,7 @@ export class SecretaryComponent implements OnInit, OnDestroy {
   }
 
   // 导出表格
-  exportTable(e: any) {
+  exportTable() {
     // 将导出的部分用html包裹，并设置编码格式，以解决导出内容乱码问题
     const data = `<html><head><meta charset='utf-8' /></head><body>` + $('#table')[0].outerHTML + `</body></html>`;
     // 设置文件导出类型未excel
@@ -100,7 +102,7 @@ export class SecretaryComponent implements OnInit, OnDestroy {
     const fd = new FormData();
     fd.append('file', blob, '学生成绩表.xls');  // fileData为自定义
     // 上传blob文件
-    this.fileService.upload('152040135120', fd).subscribe((res: any) => {
+    this.fileService.upload(this.user.uid, fd).subscribe((res: any) => {
       alert('文件成功导入数据库');
       console.log(res);
     });

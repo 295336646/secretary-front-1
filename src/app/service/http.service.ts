@@ -47,7 +47,7 @@ export class HttpService {
 
   // 分组
   groupAll(): Observable<any> {
-    return this.http.get(`${this.Url}/groupAll`).pipe(catchError(this.config.handleError));
+    return this.http.get(`${this.Url}/showGroups`).pipe(catchError(this.config.handleError));
   }
 
   // 老师
@@ -58,5 +58,11 @@ export class HttpService {
   // 学生
   showStudents(): Observable<any> {
     return this.http.get(`${this.Url}/showStudents`).pipe(catchError(this.config.handleError));
+  }
+
+  // 分组
+  dividedGroup(id: string, sgroup: string, tjudge: string): Observable<any> {
+    const params = new HttpParams().set('sgroup', sgroup).set('tjudge', tjudge);
+    return this.http.put(`${this.Url}/dividedGroup/${id}`, null, {params}).pipe(catchError(this.config.handleError));
   }
 }

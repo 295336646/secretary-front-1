@@ -1,17 +1,31 @@
 <div class="container">
-  <div>
-    <tabset>
-      <tab *ngFor="let group of groups" heading={{group}}>
-        <app-teacher [teacherFlag]="teacherFlag" #teacher></app-teacher>
-        <app-student #student></app-student>
-        <app-teacher [teacherFlag]="!teacherFlag" #judge></app-teacher>
-        <button class="btn btn-success" (click)="submit()">提交</button>
-      </tab>
-    </tabset>
-  </div>
-  <table class="table table-bordered table-hover" style="width: 90%">
+  <tabset>
+    <tab *ngFor="let group of groups;let i = index" [active]="i==0">
+      <ng-template tabHeading>
+        {{group}}
+        <button class="btn btn-danger btn-xs" (click)="romoveGroup(i)" id="remove">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </ng-template>
+      <app-teacher (outer)="getCheckTeacher($event)"></app-teacher>
+      <app-student (outer)="getCheckStudents($event)"></app-student>
+      <button class="btn btn-success" (click)="submit(group)">提交</button>
+    </tab>
+    <tab>
+      <ng-template tabHeading>
+        <button class="btn btn-success btn-xs" (click)="addGroup()">
+          <span class="glyphicon glyphicon-plus"></span>
+        </button>
+      </ng-template>
+    </tab>
+  </tabset>
+  <br>
+  <button class="btn btn-success" (click)="exportTable()">导出</button>
+  <br>
+  <table class="table table-bordered table-hover" style="width: 90%" id="group">
     <thead>
     <tr>
+      <th>序号</th>
       <th>所属班级</th>
       <th>学生学号</th>
       <th>学生姓名</th>
@@ -24,18 +38,28 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let stu of list">
+    <tr *ngFor="let stu of list;let i =index">
+      <td>{{i+1}}</td>
       <td>{{stu.sclass}}</td>
       <td>{{stu.sid}}</td>
       <td>{{stu.sname}}</td>
       <td>{{stu.teacher.tid}}</td>
       <td>{{stu.teacher.tname}}</td>
       <td>{{stu.course.cname}}</td>
-      <td>{{stu.judge.teacher.tid}}</td>
-      <td>{{stu.judge.teacher.tname}}</td>
+      <td>
+        <span *ngIf="stu.tjudge!=='0'">{{stu.tjudge}}</span>
+        <span *ngIf="stu.tjudge==='0'">暂未分配</span>
+      </td>
+      <td>
+        <span *ngIf="stu.tjudge!=='0'">{{stu.judge.teacher.tname}}</span>
+        <span *ngIf="stu.tjudge==='0'">暂未分配</span>
+      </td>
       <td>
         <span *ngIf=stu.sgroup>
           {{stu.sgroup}}组
+        </span>
+        <span *ngIf=!stu.sgroup>
+         暂未分配
         </span>
       </td>
     </tr>
