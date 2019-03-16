@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {HttpService} from '../../service/http.service';
 import {Student} from './student/student';
 import {TeacherComponent} from './teacher/teacher.component';
@@ -23,7 +23,7 @@ export class GroupComponent implements OnInit {
   flag = false;
   @Input() user: User;
 
-  constructor(private httpService: HttpService, private fileService: FileService) {
+  constructor(private httpService: HttpService, private fileService: FileService, private changeDetectorRef: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -44,6 +44,8 @@ export class GroupComponent implements OnInit {
   groupAll() {
     this.httpService.groupAll().subscribe((result: any) => {
       this.list = result;
+    }, (error: any) => {
+      alert(error);
     });
   }
 
@@ -61,18 +63,13 @@ export class GroupComponent implements OnInit {
           } else {
             alert('分组成功');
           }
-        },
-        () => {
+        }, (error: any) => {
+          alert(error);
         }, () => {
+          this.groupAll();
         }
       );
     }
-    // this.checkStudents.forEach((student: Student) => {
-    //   this.httpService.dividedGroup(student.sid, group, this.checkTeacher.tid).subscribe((res: any) => {
-    //     this.flag = res;
-    //   });
-    // });
-    this.groupAll();
   }
 
   addGroup() {
