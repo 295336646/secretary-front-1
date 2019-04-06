@@ -1,6 +1,7 @@
 <!--页面加载条-->
 <!--loading为true则显示，反之隐藏-->
 <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
+<img src="assets/main_03.jpg" alt="" width="100%">
 <!--整体div-->
 <div class="wrap">
   <!-- 左边内容 -->
@@ -26,11 +27,11 @@
 
     <div class="menu-title">秘书管理</div>
     <!--选项卡1-->
-    <div class="menu-item menu-item-active" href="#one" data-toggle="tab">
+    <div class="menu-item" href="#one" data-toggle="tab">
       －成绩管理
     </div>
     <!--选项卡2-->
-    <div class="menu-item" href="#two" data-toggle="tab" (click)="showFiles()">
+    <div class="menu-item" id="file" href="#two" data-toggle="tab" (click)="showFiles()">
       －文件管理
     </div>
     <!--选项卡3-->
@@ -46,7 +47,7 @@
   <!-- 右边内容 -->
   <div id="right" class="tab-content right">
     <!--默认激活内容-->
-    <div id="one" class="tab-pane active">
+    <div id="one" class="tab-pane">
       <app-secretary [user]="user"></app-secretary>
     </div>
     <!--待激活内容-->
@@ -62,7 +63,16 @@
     <div id="four" class="tab-pane">
       <app-update [user]="user"></app-update>
     </div>
+    <!--<img src="assets/report.jpg" alt="">-->
+    <div id="report" class="pull-right">
+      <button type="button" class="close" aria-label="Close" (click)="decline()"
+              style="padding-top: 5px;padding-right: 10px">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <p style="padding-top: 40px;padding-left: 40px">等待老师审核开题报告 <br>
+        <a href="javascript:void(0);" style="padding-left: 10px" (click)="report()">查看</a>
+      </p>
+    </div>
   </div>
-
 </div>
 

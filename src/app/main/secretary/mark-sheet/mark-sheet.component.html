@@ -1,0 +1,92 @@
+<a href="javascript:void(0);" (click)="openModal(template)">答辩评分表</a><br>
+<ng-template #template>
+  <div class="modal-body">
+    <h3 class="text-center">苏州科技大学</h3>
+    <h2 class="text-center">毕业设计（论文）评阅人评分表</h2>
+    <table class="table table-hover table-bordered">
+      <tr>
+        <td>学院（系）名</td>
+        <td>电子与信息工程学院</td>
+        <td>专业名称</td>
+        <td>计算机科学与技术</td>
+        <td>学生学号</td>
+        <td>{{secretary.sid}}</td>
+        <td>学生姓名</td>
+        <td>{{secretary.sname}}</td>
+      </tr>
+      <tr>
+        <td>课题名称</td>
+        <td colspan="4">{{secretary.course.cname}}</td>
+        <td>评阅教师</td>
+        <td colspan="2">杨利娟</td>
+      </tr>
+      <tr>
+        <td>序号</td>
+        <td colspan="4">评分项目</td>
+        <td>分值</td>
+        <td colspan="2">评分</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td colspan="4">任务完成情况</td>
+        <td>30</td>
+        <td colspan="2"><span [innerText]="reply.task"></span></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td colspan="4">技术水平</td>
+        <td>20</td>
+        <td colspan="2">
+          <span [innerText]="reply.technology"></span>
+        </td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td colspan="4">语言表达</td>
+        <td>20</td>
+        <td colspan="2">
+          <span [innerText]="reply.language"></span>
+        </td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td colspan="4">回答问题</td>
+        <td>30</td>
+        <td colspan="2">
+          <span [innerText]="reply.answer"></span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5">评阅人建议成绩</td>
+        <td>100</td>
+        <td colspan="2">
+          {{secretary.grade.replyGrade}}
+        </td>
+      </tr>
+      <tr>
+        <td>评阅人评语</td>
+        <td colspan="7">
+          评阅教师评语（评价要点：①设计（论文）选题的价值与意义；②基础理论及基本技能的掌握；③综合运用所学知识解决实际问题的能力；④工作量的大小；⑤取得的主要成果及创新点；⑥写作的规范程度；⑦总体评价；⑧存在问题；是否同意答辩等）：
+        </td>
+      </tr>
+      <tr>
+        <td>评阅人签名</td>
+        <td colspan="4"></td>
+        <td>日期</td>
+        <td colspan="2"><span class="pull-right">年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span></td>
+      </tr>
+    </table>
+    <div class="row">
+      <div class="col-md-1"><span class="pull-right">说明:</span></div>
+      <div class="col-md-11">1．本表计分满分为100分，权重为20%</div>
+      <div class="col-md-11 col-md-offset-1">
+        2．上述评分项目和各项目的权重分仅供参考。学院（系）可根据本学院（系）专业情况定评分项目和各项目的权重分，但评分项目不少于7项。
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="export()">导出</button>
+    <button class="btn btn-primary" (click)="decline()">关闭</button>
+  </div>
+</ng-template>

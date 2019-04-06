@@ -1,91 +1,131 @@
 <!--页面加载条-->
 <!--loading为true则显示，反之隐藏-->
 <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
-<!--选项卡标题-->
-<ng-template tabHeading>
-  <div class="btn" (click)="reset()" role="button" style="width: 100%;height: 100%" id="{{state}}">{{state}}</div>
-</ng-template>
-<div style="padding: 50px 0">
-  <!--如果是登录界面，则显示登录表单，否则注册表单-->
-  <form class="contain-wrapper form-horizontal" [formGroup]="Form"
-        (ngSubmit)="(state=='登录')?login(f.value):register(f.value)"
-        #f="ngForm">
-    <div class="item form-group has-feedback">
-      <!--填写用户名-->
-      <label for="uid{{key}}" class="control-label">账号</label>
-      <input type="text" id="uid{{key}}" formControlName="uid" class="input-lg">
-      <div class="bottom-line"></div>
-      <span class="glyphicon glyphicon-ok form-control-feedback" [class.sr-only]="uid.invalid"></span>
-      <span class="glyphicon glyphicon-remove form-control-feedback"
-            [class.sr-only]="!(uid.invalid && (uid.dirty || uid.touched))"></span>
-    </div>
-    <br>
-    <!--如果输入不合法，则提示错误信息-->
-    <div *ngIf="uid.invalid && (uid.dirty || uid.touched)" class="alert alert-danger small">
-      <p *ngIf="uid.hasError('invalidUserId')">
-        请填写合法的账号！
-      </p>
-    </div>
-    <!--检查用户是否已注册-->
-    <div *ngIf="checkUser" class="alert alert-danger small">
-      <p>
-        账号已存在！
-      </p>
+<form class="form-horizontal" [formGroup]="Form" (submit)="login()">
+  <div class="form-group">
+    <div class="col-md-10">
+      <label class="control-label">账号</label>
+      <input type="text" class="form-control" formControlName="uid">
     </div>
 
-    <!--注册姓名-->
-    <div *ngIf="state=='注册'" class="item form-group has-feedback">
-      <label for="userName{{key}}" class="control-label">昵称</label>
-      <input type="text" id="userName{{key}}" formControlName="userName" class="input-lg">
-      <div class="bottom-line"></div>
-      <span class="glyphicon glyphicon-ok form-control-feedback" [class.sr-only]="userName.hasError('required')"></span>
-      <div [class.sr-only]="!(userName.invalid && (userName.dirty || userName.touched))">
-        <span class="glyphicon glyphicon-remove form-control-feedback"
-              [class.sr-only]="!(userName.invalid && (userName.dirty || userName.touched))"></span>
-      </div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-10">
+      <label>密码</label>
+      <input type="password" class="form-control" formControlName="password">
     </div>
-    <!--如果输入不合法，则提示错误信息-->
-    <div *ngIf="userName.invalid && (userName.dirty || userName.touched)" class="alert alert-danger small">
-      <p *ngIf="userName.hasError('required')">
-        请填写姓名！
-      </p>
+    <img src="assets/login.jpg" style="padding-bottom: 10px">
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-2">
+      <input type="radio" value="0" name="role" formControlName="role" checked>学生
+      <input type="radio" value="1" name="role" formControlName="role">老师
+      <input type="radio" value="2" name="role" formControlName="role">秘书
     </div>
-
-    <div class="item form-group has-feedback">
-      <!--填写密码-->
-      <label for="password{{key}}" class="control-label">密码</label>
-      <input type="password" id="password{{key}}" formControlName="password" class="input-lg">
-      <div class="bottom-line"></div>
-      <span class="glyphicon glyphicon-ok form-control-feedback" [class.sr-only]="password.hasError('required')"></span>
-      <span class="glyphicon glyphicon-remove form-control-feedback"
-            [class.sr-only]="!((password.invalid && (password.dirty || password.touched)))"></span>
-    </div>
-    <!--如果输入不合法，则提示错误信息-->
-    <div *ngIf="password.invalid && (password.dirty || password.touched)" class="alert alert-danger small">
-      <p *ngIf="password.hasError('required')">
-        请填写密码！
-      </p>
-    </div>
-    <!--区分用户身份-->
+  </div>
+  <div class="col-md-offset-1">
     <div class="form-group">
-      <label class="control-label">身份：</label>
-      <input type="radio" formControlName="role" name="role" value="0">学生
-      <input type="radio" formControlName="role" name="role" value="1">老师
-      <input type="radio" formControlName="role" name="role" value="2">秘书
+      <label for="input" class="control-label">验证码</label>
+      <input type="text" id="input" [(ngModel)]="input" [ngModelOptions]="{standalone: true}"
+             style="width: 50px;margin: 0 10px"/>
+      <input type="button" (click)="change()" id="code" [(ngModel)]="code" [ngModelOptions]="{standalone: true}"/>
     </div>
-    <!--区分登录按钮和注册按钮-->
-    <div *ngIf="state=='登录'">
-      <div class="form-group">
-        <label for="input" class="control-label">验证码:</label>
-        <input type="text" id="input" [(ngModel)]="input" [ngModelOptions]="{standalone: true}"
-               style="width: 50px;margin: 0 10px"/>
-        <input type="button" (click)="change()" id="code" [(ngModel)]="code" [ngModelOptions]="{standalone: true}"/>
-      </div>
-      <button class="btn btn-primary confirm" [disabled]="uid.invalid || password.invalid" type="submit">登录</button>
+    <div class="col-md-2">
+      <button class="btn btn-success" type="submit">登录</button>
     </div>
-    <div *ngIf="state=='注册'">
-      <button class="btn btn-primary confirm" [disabled]="Form.invalid" type="submit">注册
-      </button>
+    <div class="col-md-2 col-md-offset-2">
+      <button class="btn btn-success">取消</button>
     </div>
-  </form>
-</div>
+  </div>
+
+</form>
+
+
+<!--选项卡标题-->
+<!--<ng-template tabHeading>-->
+<!--<div class="btn" (click)="reset()" role="button" style="width: 100%;height: 100%" id="{{state}}">{{state}}</div>-->
+<!--</ng-template>-->
+<!--<div style="padding: 50px 0">-->
+<!--&lt;!&ndash;如果是登录界面，则显示登录表单，否则注册表单&ndash;&gt;-->
+<!--<form class="contain-wrapper form-horizontal" [formGroup]="Form"-->
+<!--(ngSubmit)="(state=='登录')?login(f.value):register(f.value)"-->
+<!--#f="ngForm">-->
+<!--<div class="item form-group has-feedback">-->
+<!--&lt;!&ndash;填写用户名&ndash;&gt;-->
+<!--<label for="uid{{key}}" class="control-label">账号</label>-->
+<!--<input type="text" id="uid{{key}}" formControlName="uid" class="input-lg">-->
+<!--<div class="bottom-line"></div>-->
+<!--<span class="glyphicon glyphicon-ok form-control-feedback" [class.sr-only]="uid.invalid"></span>-->
+<!--<span class="glyphicon glyphicon-remove form-control-feedback"-->
+<!--[class.sr-only]="!(uid.invalid && (uid.dirty || uid.touched))"></span>-->
+<!--</div>-->
+<!--<br>-->
+<!--&lt;!&ndash;如果输入不合法，则提示错误信息&ndash;&gt;-->
+<!--<div *ngIf="uid.invalid && (uid.dirty || uid.touched)" class="alert alert-danger small">-->
+<!--<p *ngIf="uid.hasError('invalidUserId')">-->
+<!--请填写合法的账号！-->
+<!--</p>-->
+<!--</div>-->
+<!--&lt;!&ndash;检查用户是否已注册&ndash;&gt;-->
+<!--<div *ngIf="checkUser" class="alert alert-danger small">-->
+<!--<p>-->
+<!--账号已存在！-->
+<!--</p>-->
+<!--</div>-->
+
+<!--&lt;!&ndash;注册姓名&ndash;&gt;-->
+<!--<div *ngIf="state=='注册'" class="item form-group has-feedback">-->
+<!--<label for="userName{{key}}" class="control-label">昵称</label>-->
+<!--<input type="text" id="userName{{key}}" formControlName="userName" class="input-lg">-->
+<!--<div class="bottom-line"></div>-->
+<!--<span class="glyphicon glyphicon-ok form-control-feedback" [class.sr-only]="userName.hasError('required')"></span>-->
+<!--<div [class.sr-only]="!(userName.invalid && (userName.dirty || userName.touched))">-->
+<!--<span class="glyphicon glyphicon-remove form-control-feedback"-->
+<!--[class.sr-only]="!(userName.invalid && (userName.dirty || userName.touched))"></span>-->
+<!--</div>-->
+<!--</div>-->
+<!--&lt;!&ndash;如果输入不合法，则提示错误信息&ndash;&gt;-->
+<!--<div *ngIf="userName.invalid && (userName.dirty || userName.touched)" class="alert alert-danger small">-->
+<!--<p *ngIf="userName.hasError('required')">-->
+<!--请填写姓名！-->
+<!--</p>-->
+<!--</div>-->
+
+<!--<div class="item form-group has-feedback">-->
+<!--&lt;!&ndash;填写密码&ndash;&gt;-->
+<!--<label for="password{{key}}" class="control-label">密码</label>-->
+<!--<input type="password" id="password{{key}}" formControlName="password" class="input-lg">-->
+<!--<div class="bottom-line"></div>-->
+<!--<span class="glyphicon glyphicon-ok form-control-feedback" [class.sr-only]="password.hasError('required')"></span>-->
+<!--<span class="glyphicon glyphicon-remove form-control-feedback"-->
+<!--[class.sr-only]="!((password.invalid && (password.dirty || password.touched)))"></span>-->
+<!--</div>-->
+<!--&lt;!&ndash;如果输入不合法，则提示错误信息&ndash;&gt;-->
+<!--<div *ngIf="password.invalid && (password.dirty || password.touched)" class="alert alert-danger small">-->
+<!--<p *ngIf="password.hasError('required')">-->
+<!--请填写密码！-->
+<!--</p>-->
+<!--</div>-->
+<!--&lt;!&ndash;区分用户身份&ndash;&gt;-->
+<!--<div class="form-group">-->
+<!--<label class="control-label">身份：</label>-->
+<!--<input type="radio" formControlName="role" name="role" value="0">学生-->
+<!--<input type="radio" formControlName="role" name="role" value="1">老师-->
+<!--<input type="radio" formControlName="role" name="role" value="2">秘书-->
+<!--</div>-->
+<!--&lt;!&ndash;区分登录按钮和注册按钮&ndash;&gt;-->
+<!--<div *ngIf="state=='登录'">-->
+<!--<div class="form-group">-->
+<!--<label for="input" class="control-label">验证码:</label>-->
+<!--<input type="text" id="input" [(ngModel)]="input" [ngModelOptions]="{standalone: true}"-->
+<!--style="width: 50px;margin: 0 10px"/>-->
+<!--<input type="button" (click)="change()" id="code" [(ngModel)]="code" [ngModelOptions]="{standalone: true}"/>-->
+<!--</div>-->
+<!--<button class="btn btn-primary confirm" [disabled]="uid.invalid || password.invalid" type="submit">登录</button>-->
+<!--</div>-->
+<!--<div *ngIf="state=='注册'">-->
+<!--<button class="btn btn-primary confirm" [disabled]="Form.invalid" type="submit">注册-->
+<!--</button>-->
+<!--</div>-->
+<!--</form>-->
+<!--</div>-->

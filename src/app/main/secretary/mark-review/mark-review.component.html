@@ -1,0 +1,59 @@
+<a href="javascript:void(0);" (click)="openModal(template)">答辩评议书</a>
+<ng-template #template>
+  <div class="modal-body">
+    <h3 class="text-center">苏州科技大学</h3>
+    <h2 class="text-center">毕业设计（论文）答辩评议书</h2>
+    <table class="table table-bordered table-hover">
+      <tr>
+        <td>学院（系）名</td>
+        <td>电子与信息工程学院</td>
+        <td>专业名称</td>
+        <td>计算机科学与技术</td>
+        <td>学生学号</td>
+        <td>{{secretary.sid}}</td>
+        <td>学生姓名</td>
+        <td>{{secretary.sname}}</td>
+      </tr>
+      <tr>
+        <td>题目名称</td>
+        <td colspan="7">{{secretary.course.cname}}</td>
+      </tr>
+      <tr>
+        <td colspan="8">
+          指导教师评分 <u>{{secretary.grade.advisorGrade}}</u>（权重 0.4 ）
+          评阅教师评分 <u>{{secretary.grade.reviewGrade}} </u>（权重 0.2 ）
+          答辩小组评分 <u>{{secretary.grade.replyGrade}}</u> （权重 0.4 ）
+        </td>
+      </tr>
+      <tr>
+        <td colspan="8">综合成绩：<u>{{secretary.grade.advisorGrade*0.4+secretary.grade.reviewGrade*0.2+secretary.grade.replyGrade*0.4 |
+          number : '1.0-0'}}</u></td>
+      </tr>
+      <tr>
+        <td colspan="8">
+          答辩委员会评议意见：
+          根据指导教师、审阅人和答辩小组评定成绩和意见，经学院本科生毕业设计(论文)答辩委员会审核评议：
+          <div
+            [ngSwitch]="check(secretary.grade.advisorGrade*0.4+secretary.grade.reviewGrade*0.2+secretary.grade.replyGrade*0.4 | number : '1.0-0')">
+            <span *ngSwitchCase="0">{{secretary.sname}}同学的毕业设计（论文）终评成绩为不及格。</span>
+            <span *ngSwitchCase="1">{{secretary.sname}}同学的毕业设计（论文）终评成绩为及格。</span>
+            <span *ngSwitchCase="2">{{secretary.sname}}同学的毕业设计（论文）终评成绩为中等。</span>
+            <span *ngSwitchCase="3">{{secretary.sname}}同学的毕业设计（论文）终评成绩为良好。</span>
+            <span *ngSwitchDefault>{{secretary.sname}}同学的毕业设计（论文）终评成绩为优秀。</span>
+          </div>
+          <div class="col-md-offset-8">
+            答辩委员会主任：
+          </div>
+          <div class="col-md-offset-10">
+                  <span>年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="export()">导出</button>
+    <button class="btn btn-primary" (click)="decline()">关闭</button>
+  </div>
+</ng-template>

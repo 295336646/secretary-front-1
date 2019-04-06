@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {catchError} from 'rxjs/operators';
 import {ConfigService} from './config.service';
 
@@ -22,6 +22,7 @@ export class FileService {
     return this.http.get(`${this.Url}/showFiles`).pipe(catchError(this.config.handleError));
   }
 
+// 上传文件
   upload(uid: string, data: any): Observable<any> {
     return this.http.post(`${this.Url}/upload/${uid}`, data, {headers}).pipe(catchError(this.config.handleError));
   }

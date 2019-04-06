@@ -1,10 +1,10 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
 import * as $ from 'jquery';
 import {AuthService} from '../service/auth.service';
 import {User} from '../home/user';
 import {FileService} from '../service/file.service';
-
+import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-main',
@@ -16,8 +16,14 @@ export class MainComponent implements OnInit, AfterViewInit {
   loading: boolean;
   user: User = new User();
   users: Array<User>;
+  config: any = {
+    animated: true,
+    backdrop: 'static',
+    keyboard: false
+  };
 
-  constructor(private authService: AuthService, private route: ActivatedRoute, private fileService: FileService) {
+  constructor(private authService: AuthService, private route: ActivatedRoute,
+              private fileService: FileService) {
     this.name = sessionStorage.getItem('name');
     this.loading = true;
   }
@@ -31,7 +37,18 @@ export class MainComponent implements OnInit, AfterViewInit {
     $('.menu-item').click(function () {
       $('.menu-item').removeClass('menu-item-active');
       $(this).addClass('menu-item-active');
+      $('#report').hide();
+      // $('.toast-warning.ngx-toastr.ng-trigger.ng-trigger-flyInOut').hide();
     });
+  }
+
+  report() {
+    $('#file').click();
+    $('#report').hide();
+  }
+
+  decline() {
+    $('#report').hide();
   }
 
   // // 视图加载好后去除加载条

@@ -23,9 +23,14 @@ import {SecretaryModalComponent} from './main/secretary/secretary-modal-view/sec
 import {ModalModule} from 'ngx-bootstrap';
 import {ProgressbarModule} from 'ngx-bootstrap';
 import {FileService} from './service/file.service';
-import { GroupComponent } from './main/group/group.component';
-import { TeacherComponent } from './main/group/teacher/teacher.component';
-import { StudentComponent } from './main/group/student/student.component';
+import {GroupComponent} from './main/group/group.component';
+import {TeacherComponent} from './main/group/teacher/teacher.component';
+import {StudentComponent} from './main/group/student/student.component';
+import {ReplyGradeModalComponent} from './main/secretary/reply-grade-modal/reply-grade-modal.component';
+import {MarkSheetComponent} from './main/secretary/mark-sheet/mark-sheet.component';
+import {MarkReviewComponent} from './main/secretary/mark-review/mark-review.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ToastContainerModule, ToastrModule} from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -42,6 +47,9 @@ import { StudentComponent } from './main/group/student/student.component';
     GroupComponent,
     TeacherComponent,
     StudentComponent,
+    ReplyGradeModalComponent,
+    MarkSheetComponent,
+    MarkReviewComponent,
   ],
   imports: [
     BrowserModule,
@@ -60,7 +68,12 @@ import { StudentComponent } from './main/group/student/student.component';
     // 模态框模块
     ModalModule.forRoot(),
     // 进度条模块
-    ProgressbarModule.forRoot()
+    ProgressbarModule.forRoot(),
+    // 动画模块
+    BrowserAnimationsModule,
+    // 提示框模块
+    ToastrModule.forRoot({positionClass: 'inline'}),
+    ToastContainerModule
   ],
   // 注册服务
   providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}, HttpService, AuthService, ConfigService, FileService],

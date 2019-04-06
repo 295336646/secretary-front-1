@@ -1,10 +1,7 @@
-import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {HttpService} from '../../service/http.service';
 import {Student} from './student/student';
-import {TeacherComponent} from './teacher/teacher.component';
-import {StudentComponent} from './student/student.component';
 import {Teacher} from './teacher/teacher';
-import {Alert} from 'selenium-webdriver';
 import * as $ from 'jquery';
 import {FileService} from '../../service/file.service';
 import {User} from '../../home/user';
@@ -23,11 +20,11 @@ export class GroupComponent implements OnInit {
   flag = false;
   @Input() user: User;
 
-  constructor(private httpService: HttpService, private fileService: FileService, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private httpService: HttpService, private fileService: FileService) {
   }
 
   ngOnInit() {
-    this.groupAll();
+    // this.groupAll();
     if (localStorage.getItem('groups') !== null) {
       this.groups = JSON.parse(localStorage.getItem('groups'));
     }

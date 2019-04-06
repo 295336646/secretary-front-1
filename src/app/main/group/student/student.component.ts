@@ -3,7 +3,7 @@ import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {HttpService} from '../../../service/http.service';
 import {Student} from './student';
 import * as $ from 'jquery';
-import {Teacher} from '../teacher/teacher';
+
 
 @Component({
   selector: 'app-student',

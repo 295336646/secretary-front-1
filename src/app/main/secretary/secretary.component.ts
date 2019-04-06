@@ -1,10 +1,11 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import * as $ from 'jquery';
 import {saveAs} from 'file-saver';
 import {HttpService} from '../../service/http.service';
-import {Secretary} from './secretary';
 import {FileService} from '../../service/file.service';
 import {User} from '../../home/user';
+import {PageInfo} from './PageInfo';
+import {HttpParams} from '@angular/common/http';
 
 @Component({
   selector: 'app-secretary',
@@ -12,39 +13,90 @@ import {User} from '../../home/user';
   styleUrls: ['./secretary.component.scss']
 })
 export class SecretaryComponent implements OnInit, OnDestroy {
-  secretaries: Array<Secretary> = [];
-  flags: Array<string> = ['guidanceScore', 'ratingScore', 'replyScore'];
+  @ViewChild('reply') rep: any;
+  pageInfo: PageInfo = new PageInfo();
   timer: any;
   today: Date;
   texts: string; // 保存初始span里面的值
   total: string;
+  review: string;
+  data: any;
+  down = 'http://localhost:8080/cl/';
+  downAddress: Array<string> = ['downWordSheet?', 'downWordReview?'];
   @Input() user: User;
 
   constructor(private http: HttpService, private fileService: FileService) {
+    this.pageInfo.firstPage = '1';
     this.timer = setInterval(() => {
       this.today = new Date();
     }, 50);
   }
 
   ngOnInit() {
-    this.http.reply().subscribe((res: any) => {
-      this.secretaries = res.extend.secretaries;
+    const params = new HttpParams().set('pn', this.pageInfo.firstPage);
+    this.getReview(params);
+  }
+
+  getReview(params: HttpParams) {
+    this.http.reply(params).subscribe((result: any) => {
+      this.pageInfo.students = result.extend.pageInfo.list;
+      this.pageInfo.pageNum = result.extend.pageInfo.pageNum;
+      this.pageInfo.pages = result.extend.pageInfo.pages;
+      this.pageInfo.total = result.extend.pageInfo.total;
+      this.pageInfo.lastPage = result.extend.pageInfo.total;
+      this.pageInfo.hasPreviousPage = result.extend.pageInfo.hasPreviousPage;
+      this.pageInfo.hasNextPage = result.extend.pageInfo.hasNextPage;
+      this.pageInfo.navigatepageNums = result.extend.pageInfo.navigatepageNums;
     }, (error: any) => {
       alert(error);
     });
   }
 
+  getPage(page_Num: string) {
+    const params = new HttpParams().set('pn', page_Num);
+    this.getReview(params);
+    return false;
+  }
+
+  getFirstPage() {
+    const params = new HttpParams().set('pn', this.pageInfo.firstPage);
+    this.getReview(params);
+    return false;
+  }
+
+  getPreviousPage() {
+    const params = new HttpParams().set('pn', (this.pageInfo.pageNum - 1).toString());
+    this.getReview(params);
+    return false;
+  }
+
+  getNextPage() {
+    const params = new HttpParams().set('pn', (this.pageInfo.pageNum + 1).toString());
+    this.getReview(params);
+    return false;
+  }
+
+  getLastPage() {
+    const params = new HttpParams().set('pn', this.pageInfo.lastPage);
+    this.getReview(params);
+    return false;
+  }
+
+  // 核对总评
   check(data: any) {
     const total = Number(data);
     if (total < 60) {
-      return '0';
+      this.review = '不及格';
     } else if (total >= 60 && total < 70) {
-      return '1';
+      this.review = '及格';
     } else if (total >= 70 && total < 80) {
-      return '2';
+      this.review = '中等';
     } else if (total >= 80 && total < 90) {
-      return '3';
+      this.review = '良好';
+    } else {
+      this.review = '优秀';
     }
+    return true;
   }
 
   // 修改表中数据
@@ -107,6 +159,42 @@ export class SecretaryComponent implements OnInit, OnDestroy {
       console.log(res);
     });
     // saveAs(blob, '学生成绩表.xls');
+  }
+
+  downWordSheet(secretary: any) {
+    // if (localStorage.getItem(secretary.sid)) {
+    //   this.reply = JSON.parse(localStorage.getItem(secretary.sid));
+    // }
+    if (!this.rep.reply.task || !this.rep.reply.technology ||
+      !this.rep.reply.language || !this.rep.reply.answer || !this.rep.reply.comments) {
+      this.rep.reply.task = secretary.grade.task;
+      this.rep.reply.technology = secretary.grade.technology;
+      this.rep.reply.language = secretary.grade.language;
+      this.rep.reply.answer = secretary.grade.answer;
+      this.rep.reply.comments = secretary.grade.comments;
+    }
+    const sid = secretary.sid;
+    const sname = secretary.sname;
+    const cname = secretary.course.cname;
+    const replyGrade = secretary.grade.replyGrade;
+    this.data = `sid=${sid}&sname=${sname}&cname=${cname}
+     &task=${this.rep.reply.task}&technology=${this.rep.reply.technology}
+    &language=${this.rep.reply.language}&answer=${this.rep.reply.answer}&replyGrade=${replyGrade}
+   &comments=${this.rep.reply.comments}`;
+  }
+
+  downWordReview(secretary: any, review: any) {
+    const sid = secretary.sid;
+    const sname = secretary.sname;
+    const cname = secretary.course.cname;
+    const advisorGrade = secretary.grade.advisorGrade;
+    const reviewGrade = secretary.grade.reviewGrade;
+    const replyGrade = secretary.grade.replyGrade;
+    const total = (secretary.grade.advisorGrade * 0.4 + secretary.grade.reviewGrade * 0.2 + secretary.grade.replyGrade * 0.4)
+      .toFixed(0);
+    this.data = `sid=${sid}&sname=${sname}&cname=${cname}
+    &advisorGrade=${advisorGrade}&reviewGrade=${reviewGrade}
+    &replyGrade=${replyGrade}&total=${total}&review=${this.review}`;
   }
 
   // 页面销毁时，清除时间

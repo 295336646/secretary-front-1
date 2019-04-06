@@ -1,45 +1,3 @@
-// form 表单
-.contain-wrapper {
-  width: 200px;
-  margin: 10px auto;
-}
-
-// 确认按钮
-.confirm {
-  margin-top: 20px;
-  width: 100%;
-}
-
-.item {
-  position: relative;
-}
-
-// 默认下层label
-.item label {
-  position: absolute;
-  left: 2px;
-  bottom: 10px;
-  color: #777;
-  cursor: text;
-}
-
-.item input {
-  padding-top: 35px;
-  width: 200px;
-  height: 50px;
-  border: none;
-  outline: none;
-  border-bottom: 1px solid #c3c3c3;
-}
-
-.item .bottom-line {
-  position: absolute;
-  bottom: 2px;
-  width: 0;
-  height: 2px;
-  background-color: red;
-}
-
 #code {
   width: 80px;
   height: 30px;
@@ -51,3 +9,4 @@
   letter-spacing: 2px;
   color: blue;
 }
+

@@ -1,12 +1,26 @@
-<div class="wrapper">
-  <!--justified填充整个宽度-->
-  <tabset type="pills" [justified]="true">
-    <!--循环遍历states=['登录','注册']-->
-    <tab *ngFor="let state of states;let key = index;">
-      <!--显示form表单-->
-      <!--父组件传递一些参数给子组件-->
-      <app-home-form [state]="state" [key]="key"></app-home-form>
-    </tab>
-  </tabset>
+<!--父组件传递一些参数给子组件-->
+<!--<app-home-form [state]="state" [key]="key"></app-home-form>-->
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <img src="assets/sukeLogin.jpg">
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <img src="assets/right_01.jpg" width="100%">
+      <table class="table table-bordered">
+        <tr>
+          <td>
+            <app-home-form></app-home-form>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
 </div>
+
+
 

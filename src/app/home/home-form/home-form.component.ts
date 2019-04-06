@@ -1,8 +1,9 @@
-import {AfterContentInit, Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {HttpService} from '../../service/http.service';
 import {Router} from '@angular/router';
 import {User} from '../user';
+import {ToastrService} from 'ngx-toastr';
 
 // 正则表达式验证用户ID是否是3-13位数字
 function userIdValidator(control: FormControl): { [s: string]: boolean } {
@@ -17,13 +18,9 @@ function userIdValidator(control: FormControl): { [s: string]: boolean } {
   styleUrls: ['./home-form.component.scss']
 })
 export class HomeFormComponent implements OnInit {
-  // 子组件接收父组件传递的参数
-  @Input() state: string; // 区分登录、注册状态
-  @Input() key: number; // 区分相同id属性
   Form: FormGroup;
   loading = false;
   user: User = new User();
-  checkUser = false;
   // 验证码
   arrays: Array<any> = new Array(
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
@@ -37,44 +34,25 @@ export class HomeFormComponent implements OnInit {
   random: number;
   code = '';
   codes = '';
-  input = '';
-  inputCode = '';
+  input = ''; // 验证码输入框
 
-  constructor(private httpService: HttpService, private router: Router, private fb: FormBuilder) {
+  constructor(private httpService: HttpService, private _toastrService: ToastrService, private router: Router, private fb: FormBuilder) {
   }
 
   ngOnInit() {
     this.change();
-    this.reset();
+    this.Form = this.fb.group({
+      'uid': ['', Validators.required],
+      'userName': ['', Validators.required],
+      'password': ['', Validators.required],
+      'role': ['2']
+    });
   }
 
   // 重置表单
   reset() {
-    this.Form = this.fb.group({
-      'uid': ['', Validators.compose([
-        Validators.required, userIdValidator])],
-      'userName': ['', Validators.required],
-      'password': ['', Validators.required],
-      'role': ['0']
-    });
-
-    // 输入框获得焦点时
-    $('input').focus(function (event) {
-      // label动态上升，升至顶部
-      $(this).siblings('label').stop().animate({'bottom': '30px'}, 500);
-      // div模拟的下边框伸出，其width动态改变至input的width
-      $(this).next('.bottom-line').stop().animate({'width': '200px'}, 500);
-    });
-
-    // 输入框失去焦点时
-    $('input').blur(function (event) {
-      if ($(this).val() === '') {
-        // label动态下降，恢复原位
-        $(this).siblings('label').stop().animate({'bottom': '10px'}, 500);
-        // 用div模拟的下边框缩回，其width动态恢复为默认宽度0
-        $(this).next('.bottom-line').stop().animate({'width': '0'}, 500);
-      }
-    });
+    // this.Form.reset({role: '2'});
+    this.password.setValue('');
   }
 
   // 点击改变验证码
@@ -88,24 +66,53 @@ export class HomeFormComponent implements OnInit {
     this.code = this.codes;
   }
 
-  // 验证验证码
+  // 验证验证码和身份
   check() {
-    this.inputCode = this.input.toUpperCase();
-    if (this.inputCode.length === 0) {
-      alert('请输入验证码！');
+    const inputCode = this.input.toUpperCase();
+    // console.log(this.Form.get('role').value);
+    if (this.uid.invalid || this.password.invalid) {
+      this._toastrService.error('用户名或密码不能为空', '', {
+        closeButton: false,
+        // disableTimeOut: true,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
+      this.change();
       return false;
-    } else if (this.inputCode !== this.codes.toUpperCase()) {
-      alert('验证码输入错误!请重新输入');
+    }
+    if (this.role.value !== '2') {
+      this._toastrService.error('登录身份必须是秘书', '', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
+      this.change();
+      return false;
+    }
+    if (inputCode.length === 0) {
+      this._toastrService.error('请输入验证码', '', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
+      this.change();
+      return false;
+    } else if (inputCode !== this.codes.toUpperCase()) {
+      this._toastrService.error('验证码输入错误！！！请重新输入！！！', '', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
       this.change();
       this.input = '';
       return false;
-    } else {
-      return true;
     }
+    return true;
   }
 
   // 登录主界面
-  login(data: any) {
+  login() {
+    const data = this.Form.getRawValue();
     // 验证码校验错误,则禁止提交
     if (this.check() === false) {
       this.reset();
@@ -114,7 +121,11 @@ export class HomeFormComponent implements OnInit {
     this.loading = true;
     this.httpService.login(data).subscribe((res: any) => {
         if (res.extend.login === false) {
-          alert('用户名或密码错误');
+          this._toastrService.error('用户名或密码错误', '', {
+            closeButton: false,
+            timeOut: 1000,
+            positionClass: 'toast-top-center',
+          });
           this.reset();
           this.change();
           this.input = '';
@@ -127,6 +138,7 @@ export class HomeFormComponent implements OnInit {
         if (this.user.role === 2) {
           sessionStorage.setItem('name', this.user.userName);
           this.router.navigate(['/main', {uid: this.user.uid}]);
+          // this.router.navigate(['/main', {uid: this.user.uid}], {replaceUrl: true, skipLocationChange: true});
         }
         // this.router.navigate(['/main']);
         // skipLocationChange设为true路由跳转时浏览器中的url会保持不变，但是传入的参数依然有效
@@ -142,36 +154,15 @@ export class HomeFormComponent implements OnInit {
     );
   }
 
-// 注册
-  register(data: any) {
-    this.loading = true;
-    this.httpService.register(data).subscribe((res: any) => {
-        if (res.extend.register === false) {
-          this.loading = false;
-          this.checkUser = true; // 标记用户已注册
-          return;
-        }
-        alert('注册成功');
-      }, (error: any) => {
-        this.loading = false;
-        alert(error);
-      }, () => {
-        $('#登录').click();
-        this.loading = false;
-      }
-    );
-  }
-
-// getter方法用于页面验证表单
   get uid() {
     return this.Form.get('uid');
   }
 
-  get userName() {
-    return this.Form.get('userName');
-  }
-
   get password() {
     return this.Form.get('password');
+  }
+
+  get role() {
+    return this.Form.get('role');
   }
 }

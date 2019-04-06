@@ -1,0 +1,76 @@
+<a href="javascript:void(0);" (click)="openModal(template)">{{secretary.grade.replyGrade}}</a>
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">评分</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="decline()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="form-horizontal">
+      <div class="form-group">
+        <div class="col-md-4 control-label">
+          <label for="task">任务完成情况</label>
+        </div>
+        <div class="col-md-6">
+          <input type="text" id="task" class="form-control" placeholder="任务完成情况" [(ngModel)]="reply.task"
+                 (input)="calculate()">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-md-4 control-label">
+          <label for="technology">技术水平</label>
+        </div>
+        <div class="col-md-6">
+          <input type="text" id="technology" class="form-control" placeholder="技术水平" [(ngModel)]="reply.technology"
+                 (input)="calculate()">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-md-4 control-label">
+          <label for="language">语言表达</label>
+        </div>
+        <div class="col-md-6">
+          <input type="text" id="language" class="form-control" placeholder="语言表达" [(ngModel)]="reply.language"
+                 (input)="calculate()">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-md-4 control-label">
+          <label for="answer">回答问题</label>
+        </div>
+        <div class="col-md-6">
+          <input type="text" id="answer" class="form-control" placeholder="回答问题" [(ngModel)]="reply.answer"
+                 (input)="calculate()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-4 control-label">
+          <label for="comments">评语</label>
+        </div>
+        <div class="col-md-6">
+          <input type="text" id="comments" class="form-control" placeholder="评语" [(ngModel)]="reply.comments"
+                 (input)="calculate()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-4 control-label">
+          <label for="reply">答辩评分</label>
+        </div>
+        <div class="col-md-6">
+          <input type="text" id="reply" class="form-control" [value]=secretary.grade.replyGrade
+                 (ngModel)="secretary.grade.replyGrade" disabled>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="submit()">提交</button>
+    <button class="btn btn-primary" (click)="decline()">关闭</button>
+  </div>
+</ng-template>

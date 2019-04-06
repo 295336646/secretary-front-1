@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Observable, pipe} from 'rxjs';
+import {Observable} from 'rxjs';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {ConfigService} from './config.service';
 import {catchError} from 'rxjs/operators';
-import {text} from '@angular/core/src/render3';
+import {Grade} from '../main/secretary/grade';
 
 const headers = new HttpHeaders().set(
   'Content-type',
@@ -30,8 +30,8 @@ export class HttpService {
   }
 
   // 获取答辩表
-  reply(): Observable<any> {
-    return this.http.get(`${this.Url}/reply`).pipe(catchError(this.config.handleError));
+  reply(params: HttpParams): Observable<any> {
+    return this.http.get(`${this.Url}/reply`, {params}).pipe(catchError(this.config.handleError));
   }
 
   // 修改答辩表
@@ -64,5 +64,15 @@ export class HttpService {
   dividedGroup(id: string, sgroup: string, tjudge: string): Observable<any> {
     const params = new HttpParams().set('sgroup', sgroup).set('tjudge', tjudge);
     return this.http.put(`${this.Url}/dividedGroup/${id}`, null, {params}).pipe(catchError(this.config.handleError));
+  }
+
+  // 更新成绩
+  updateGrade(grade: Grade, sid: String): Observable<any> {
+    return this.http.put(`${this.Url}/updateGrade/${sid}`, grade, {headers}).pipe(catchError(this.config.handleError));
+  }
+
+  // 查看成绩
+  getGrade(params: HttpParams): Observable<any> {
+    return this.http.get(`${this.Url}/getGrade`, {params}).pipe(catchError(this.config.handleError));
   }
 }
