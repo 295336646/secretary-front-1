@@ -7,10 +7,7 @@ import {Component, OnInit} from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  states: Array<string>;
-
   constructor() {
-    this.states = ['登录', '注册'];
   }
 
   ngOnInit() {

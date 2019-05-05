@@ -1,1 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+// 最上方空出空白部分用来显示一些必要信息和操作
+.check-div {
+  height: 70px;
+  line-height: 70px;
+  background-color: #fff;
+  padding-left: 30px;
+  min-width: 824px !important;
+  //box-sizing: border-box;
+}

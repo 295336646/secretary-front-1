@@ -1,10 +1,12 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {HttpService} from '../../service/http.service';
-import {Student} from './student/student';
-import {Teacher} from './teacher/teacher';
-import * as $ from 'jquery';
-import {FileService} from '../../service/file.service';
 import {User} from '../../home/user';
+import {ToastrService} from 'ngx-toastr';
+import {HttpParams} from '@angular/common/http';
+import {Group} from './Group';
+import {Teacher} from './Teacher';
+
+declare var $: any;
 
 @Component({
   selector: 'app-group',
@@ -12,92 +14,165 @@ import {User} from '../../home/user';
   styleUrls: ['./group.component.scss']
 })
 export class GroupComponent implements OnInit {
+  @Input() user: User; // 当前用户
+  loading = false; // 加载条
+  groups = new Array<Group>(); // 当前组员
+  teachers = new Array<Teacher>();  // 所有老师
+  groupNum = 1; // 初始组
+  unAllocatedTeachers = new Array<Teacher>(); // 存放未分配的老师
+  allocatedTeachers = new Array<Teacher>(); // 存放已分配的老师
+  currentLeaderId: string;  // 记录当前组长id
+  currentLeaderName: string; // 记录当前组长姓名
+  interval: any;
+  time = 0;
 
-  list: Array<any>;
-  groups: Array<number> = new Array<number>();
-  checkTeacher: Teacher;
-  checkStudents: Array<Student> = new Array<Student>();
-  flag = false;
-  @Input() user: User;
-
-  constructor(private httpService: HttpService, private fileService: FileService) {
+  constructor(private httpService: HttpService, private _toastrService: ToastrService) {
   }
 
   ngOnInit() {
-    // this.groupAll();
-    if (localStorage.getItem('groups') !== null) {
-      this.groups = JSON.parse(localStorage.getItem('groups'));
-    }
+    const params = new HttpParams().set('groupNum', '' + this.groupNum);
+    this.showGroup(params);
+    this.getGroup(params);
+    this.getUnAllocatedTeachers();
+    this.interval = setInterval(() => {
+      this.refresh();
+      this.time++;
+      if (this.time === 2) {
+        this.cleInterval();
+      }
+    }, 500);
   }
 
-  getCheckTeacher(e: any) {
-    this.checkTeacher = e;
-  }
-
-  getCheckStudents(e: any) {
-    this.checkStudents = e;
-  }
-
-  groupAll() {
-    this.httpService.groupAll().subscribe((result: any) => {
-      this.list = result;
+  getGroup(params: HttpParams) {
+    this.httpService.getGroupTeacher(params).subscribe((res: any) => {
+      this.allocatedTeachers = res;
     }, (error: any) => {
-      alert(error);
-    });
-  }
-
-  submit(group: string) {
-    if (this.checkStudents.length === 0 || this.checkTeacher == null) {
-      alert('不能提交空数据');
-      return;
-    }
-    for (let i = 0; i < this.checkStudents.length; i++) {
-      this.httpService.dividedGroup(this.checkStudents[i].sid, group, this.checkTeacher.tid).subscribe((res: any) => {
-          this.flag = res;
-          if (this.flag === false) {
-            alert('不能和指导教师分为一组');
-            return;
-          } else {
-            alert('分组成功');
-          }
-        }, (error: any) => {
-          alert(error);
-        }, () => {
-          this.groupAll();
+      this._toastrService.error(error, '异常', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
+    }, () => {
+      this.allocatedTeachers.forEach((item: any) => {
+        if (item['leader'] === 1) {
+          this.currentLeaderId = item.tid;
+          this.currentLeaderName = item.tname;
+          this.refresh();
         }
-      );
+      });
+    });
+  }
+
+  getUnAllocatedTeachers() {
+    this.httpService.showTeachers().subscribe((result: any) => {
+      this.teachers = result;
+      this.unAllocatedTeachers = this.teachers.filter(function (item) {
+        return item.tgroup === 0;
+      });
+    });
+  }
+
+  refresh() {
+    $('.selectpicker').selectpicker({
+      style: 'btn-primary',
+      // 设置下拉方向始终向下
+      dropupAuto: false,
+      size: 4,
+    });
+    $('#leader').selectpicker('val', this.currentLeaderId);
+    $('.selectpicker').selectpicker('refresh');
+    $('.selectpicker').selectpicker('render');
+  }
+
+  showGroup(params: HttpParams) {
+    this.httpService.showGroup(params).subscribe((result: any) => {
+        this.groups = result;
+      }
+    );
+  }
+
+  getSelected(op: any) {
+    this.groupNum = op[0].value;
+    const params = new HttpParams().set('groupNum', '' + this.groupNum);
+    this.showGroup(params);
+    this.getGroup(params);
+  }
+
+  cleInterval() {
+    clearInterval(this.interval);
+  }
+
+  deleteTeacher(i: number, state: number) {
+    if (state === 0) {
+      this.unAllocatedTeachers.push(this.allocatedTeachers[i]);
+      this.allocatedTeachers.splice(i, 1);
+    }
+    if (state === 1) {
+      this.allocatedTeachers.push(this.unAllocatedTeachers[i]);
+      this.unAllocatedTeachers.splice(i, 1);
     }
   }
 
-  addGroup() {
-    if (this.groups.length === 0) {
-      this.groups.push(1);
-    } else {
-      this.groups.push(this.groups[this.groups.length - 1] + 1);
-    }
-    localStorage.setItem('groups', JSON.stringify(this.groups));
+  tSubmit(op: any, leaderOp: any) {
+    this.loading = true;
+    this.groupNum = op[0].value;
+    const NewLeader = leaderOp[0].value;
+    const teachers = {allocated: this.allocatedTeachers, unallocated: this.unAllocatedTeachers};
+    this.httpService.dividedTeacher(this.groupNum, this.currentLeaderId, NewLeader, teachers).subscribe((res: any) => {
+      if (res === true) {
+        this._toastrService.success('分组成功', '', {
+          closeButton: false,
+          timeOut: 1000,
+          positionClass: 'toast-top-center',
+        });
+      } else {
+        this.getUnAllocatedTeachers();
+        this._toastrService.error('分组失败', '', {
+          closeButton: false,
+          timeOut: 1000,
+          positionClass: 'toast-top-center',
+        });
+      }
+    }, (error: any) => {
+      this._toastrService.error(error, '异常', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
+    }, () => {
+      this.loading = false;
+      const params = new HttpParams().set('groupNum', '' + this.groupNum);
+      this.getGroup(params);
+    });
   }
 
-  romoveGroup(i: any) {
-    this.groups.splice(i, 1);
-    localStorage.setItem('groups', JSON.stringify(this.groups));
+  sSubmit() {
+    this.loading = true;
+    this.httpService.dividedGroup().subscribe((res: any) => {
+      if (res === true) {
+        this._toastrService.success('分组成功', '', {
+          closeButton: false,
+          timeOut: 1000,
+          positionClass: 'toast-top-center',
+        });
+      } else {
+        this._toastrService.error('分组失败', '', {
+          closeButton: false,
+          timeOut: 1000,
+          positionClass: 'toast-top-center',
+        });
+      }
+    }, (error: any) => {
+      this._toastrService.error(error, '异常', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
+    }, () => {
+      this.loading = false;
+      const params = new HttpParams().set('groupNum', '' + this.groupNum);
+      this.showGroup(params);
+    });
   }
 
-  // 导出表格
-  exportTable() {
-    // 将导出的部分用html包裹，并设置编码格式，以解决导出内容乱码问题
-    const data = `<html><head><meta charset='utf-8' /></head><body>` + $('#group')[0].outerHTML + `</body></html>`;
-    // 设置文件导出类型未excel
-    const blob = new Blob([data], {
-      type: 'application/ms-excel'
-    });
-    const fd = new FormData();
-    fd.append('file', blob, '分组表.xls');  // fileData为自定义
-    // 上传blob文件
-    this.fileService.upload(this.user.uid, fd).subscribe((res: any) => {
-      alert('文件成功导入数据库');
-      console.log(res);
-    });
-    // saveAs(blob, '学生成绩表.xls');
-  }
 }

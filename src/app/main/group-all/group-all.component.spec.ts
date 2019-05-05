@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FileComponent } from './file.component';
+import { GroupAllComponent } from './group-all.component';
 
-describe('FileComponent', () => {
-  let component: FileComponent;
-  let fixture: ComponentFixture<FileComponent>;
+describe('GroupAllComponent', () => {
+  let component: GroupAllComponent;
+  let fixture: ComponentFixture<GroupAllComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FileComponent ]
+      declarations: [ GroupAllComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FileComponent);
+    fixture = TestBed.createComponent(GroupAllComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -4,6 +4,7 @@ import {HttpService} from '../../service/http.service';
 import {Router} from '@angular/router';
 import {User} from '../user';
 import {ToastrService} from 'ngx-toastr';
+import {CookieService} from 'ngx-cookie-service';
 
 // 正则表达式验证用户ID是否是3-13位数字
 function userIdValidator(control: FormControl): { [s: string]: boolean } {
@@ -35,15 +36,16 @@ export class HomeFormComponent implements OnInit {
   code = '';
   codes = '';
   input = ''; // 验证码输入框
+  time: number = 0.5 * 60 * 60 * 1000; // cookie过期时间两个小时
 
-  constructor(private httpService: HttpService, private _toastrService: ToastrService, private router: Router, private fb: FormBuilder) {
+  constructor(private httpService: HttpService, private _toastrService: ToastrService,
+              private router: Router, private fb: FormBuilder, private cookieService: CookieService) {
   }
 
   ngOnInit() {
     this.change();
     this.Form = this.fb.group({
       'uid': ['', Validators.required],
-      'userName': ['', Validators.required],
       'password': ['', Validators.required],
       'role': ['2']
     });
@@ -132,11 +134,13 @@ export class HomeFormComponent implements OnInit {
           return false;
         }
         this.user.uid = data.uid;
-        this.user.userName = res.extend.userName;
+        // this.user.userName = res.extend.userName;
         this.user.role = Number.parseInt(data.role, 10);
         // 存储用户名并带用户id路由跳转
         if (this.user.role === 2) {
-          sessionStorage.setItem('name', this.user.userName);
+          // sessionStorage.setItem('name', this.user.userName);
+          this.cookieService.set('userName', res.extend.userName, new Date(new Date().getTime() + this.time));
+          this.cookieService.set('userId', data.uid, new Date(new Date().getTime() + this.time));
           this.router.navigate(['/main', {uid: this.user.uid}]);
           // this.router.navigate(['/main', {uid: this.user.uid}], {replaceUrl: true, skipLocationChange: true});
         }
@@ -144,7 +148,7 @@ export class HomeFormComponent implements OnInit {
         // skipLocationChange设为true路由跳转时浏览器中的url会保持不变，但是传入的参数依然有效
         // this.router.navigate(['/main', {uid: this.user.uid}], {replaceUrl: true, skipLocationChange: true});
       }, (error) => {
-        localStorage.removeItem('name');
+        // sessionStorage.removeItem('name');
         this.loading = false;
         alert(error);
       }, () => {

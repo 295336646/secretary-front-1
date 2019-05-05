@@ -9,28 +9,25 @@ import {HomeComponent} from './home/home.component';
 import {SecretaryComponent} from './main/secretary/secretary.component';
 import {MainComponent} from './main/main.component';
 import {AuthService} from './service/auth.service';
-import {FilterPipe} from './pipe/filter.pipe';
 import {HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {ConfigService} from './service/config.service';
 import {NgxLoadingModule} from 'ngx-loading';
 import {TabsModule} from 'ngx-bootstrap';
 import {HomeFormComponent} from './home/home-form/home-form.component';
 import {WeekDayPipe} from './pipe/week-day.pipe';
-import {FileComponent} from './main/file/file.component';
 import {FileUploadModule} from 'ng2-file-upload';
 import {UpdateComponent} from './main/update/update.component';
 import {SecretaryModalComponent} from './main/secretary/secretary-modal-view/secretary-modal.component';
 import {ModalModule} from 'ngx-bootstrap';
 import {ProgressbarModule} from 'ngx-bootstrap';
-import {FileService} from './service/file.service';
 import {GroupComponent} from './main/group/group.component';
-import {TeacherComponent} from './main/group/teacher/teacher.component';
-import {StudentComponent} from './main/group/student/student.component';
 import {ReplyGradeModalComponent} from './main/secretary/reply-grade-modal/reply-grade-modal.component';
 import {MarkSheetComponent} from './main/secretary/mark-sheet/mark-sheet.component';
 import {MarkReviewComponent} from './main/secretary/mark-review/mark-review.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ToastContainerModule, ToastrModule} from 'ngx-toastr';
+import {CookieService} from 'ngx-cookie-service';
+import { GroupAllComponent } from './main/group-all/group-all.component';
 
 @NgModule({
   declarations: [
@@ -38,18 +35,15 @@ import {ToastContainerModule, ToastrModule} from 'ngx-toastr';
     HomeComponent,
     SecretaryComponent,
     MainComponent,
-    FilterPipe,
     HomeFormComponent,
     WeekDayPipe,
-    FileComponent,
     UpdateComponent,
     SecretaryModalComponent,
     GroupComponent,
-    TeacherComponent,
-    StudentComponent,
     ReplyGradeModalComponent,
     MarkSheetComponent,
     MarkReviewComponent,
+    GroupAllComponent,
   ],
   imports: [
     BrowserModule,
@@ -76,7 +70,10 @@ import {ToastContainerModule, ToastrModule} from 'ngx-toastr';
     ToastContainerModule
   ],
   // 注册服务
-  providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}, HttpService, AuthService, ConfigService, FileService],
+  providers: [{
+    provide: LocationStrategy,
+    useClass: HashLocationStrategy
+  }, HttpService, AuthService, ConfigService, CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

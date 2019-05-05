@@ -1,5 +1,6 @@
 export class PageInfo {
   students: any[] = new Array();
+  groups: any[] = new Array();
   pageNum: number;
   pages: any;
   total: any;

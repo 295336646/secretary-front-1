@@ -1,40 +1,47 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import * as $ from 'jquery';
-import {saveAs} from 'file-saver';
 import {HttpService} from '../../service/http.service';
-import {FileService} from '../../service/file.service';
 import {User} from '../../home/user';
 import {PageInfo} from './PageInfo';
 import {HttpParams} from '@angular/common/http';
+import {ToastrService} from 'ngx-toastr';
+import {CookieService} from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-secretary',
   templateUrl: './secretary.component.html',
   styleUrls: ['./secretary.component.scss']
 })
-export class SecretaryComponent implements OnInit, OnDestroy {
-  @ViewChild('reply') rep: any;
+export class SecretaryComponent implements OnInit {
+  @Input() user: User;
   pageInfo: PageInfo = new PageInfo();
-  timer: any;
-  today: Date;
   texts: string; // 保存初始span里面的值
-  total: string;
-  review: string;
-  data: any;
+  total: string;  // 保存总分
+  review: string; // 标记该学生成绩等第
+  data: any; // 保留上传的数据
   down = 'http://localhost:8080/cl/';
   downAddress: Array<string> = ['downWordSheet?', 'downWordReview?'];
-  @Input() user: User;
+  // 记录当前修改成绩表
+  reply: any = {
+    id: '',
+    task: '',
+    technology: '',
+    language: '',
+    answer: '',
+    comments: ''
+  };
 
-  constructor(private http: HttpService, private fileService: FileService) {
+  constructor(private http: HttpService, private _toastrService: ToastrService, private cookieService: CookieService) {
     this.pageInfo.firstPage = '1';
-    this.timer = setInterval(() => {
-      this.today = new Date();
-    }, 50);
   }
 
   ngOnInit() {
     const params = new HttpParams().set('pn', this.pageInfo.firstPage);
     this.getReview(params);
+  }
+
+  getReply(e: any) {
+    this.reply = e;
   }
 
   getReview(params: HttpParams) {
@@ -48,7 +55,11 @@ export class SecretaryComponent implements OnInit, OnDestroy {
       this.pageInfo.hasNextPage = result.extend.pageInfo.hasNextPage;
       this.pageInfo.navigatepageNums = result.extend.pageInfo.navigatepageNums;
     }, (error: any) => {
-      alert(error);
+      this._toastrService.error(error, '异常', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
     });
   }
 
@@ -121,8 +132,12 @@ export class SecretaryComponent implements OnInit, OnDestroy {
     const newText = input.value;
     const pattern = /^\d{1,3}$/;
     // 只能是1-3位数字，且数字范围必须是0-100
-    if (!pattern.test(newText) || newText < 0 || newText > 100 || newText === '') {
-      alert('数据非法');
+    if (!pattern.test(newText) || newText < 0 || newText > 30 || newText === '') {
+      this._toastrService.error('数据非法', '非法参数异常', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
       return;
     }
     if (confirm('确定要修改吗？')) {
@@ -133,7 +148,11 @@ export class SecretaryComponent implements OnInit, OnDestroy {
           span.innerText = newText;
         }
       }, (error: any) => {
-        alert(error);
+        this._toastrService.error(error, '异常', {
+          closeButton: false,
+          timeOut: 1000,
+          positionClass: 'toast-top-center',
+        });
       });
     } else {
       // 移除文本框,不保存修改
@@ -144,45 +163,59 @@ export class SecretaryComponent implements OnInit, OnDestroy {
   }
 
   // 导出表格
-  exportTable() {
-    // 将导出的部分用html包裹，并设置编码格式，以解决导出内容乱码问题
-    const data = `<html><head><meta charset='utf-8' /></head><body>` + $('#table')[0].outerHTML + `</body></html>`;
-    // 设置文件导出类型未excel
-    const blob = new Blob([data], {
-      type: 'application/ms-excel'
-    });
-    const fd = new FormData();
-    fd.append('file', blob, '学生成绩表.xls');  // fileData为自定义
-    // 上传blob文件
-    this.fileService.upload(this.user.uid, fd).subscribe((res: any) => {
-      alert('文件成功导入数据库');
-      console.log(res);
-    });
-    // saveAs(blob, '学生成绩表.xls');
-  }
-
+  // exportTable() {
+  //   // 将导出的部分用html包裹，并设置编码格式，以解决导出内容乱码问题
+  //   const data = `<html><head><meta charset='utf-8' /></head><body>` + $('#table')[0].outerHTML + `</body></html>`;
+  //   // 设置文件导出类型未excel
+  //   const blob = new Blob([data], {
+  //     type: 'application/ms-excel'
+  //   });
+  //   const fd = new FormData();
+  //   fd.append('file', blob, '学生成绩表.xls');  // fileData为自定义
+  //   // 上传blob文件
+  //   this.fileService.upload(this.user.uid, fd).subscribe((res: any) => {
+  //     this._toastrService.success('导入成功', '', {
+  //       closeButton: false,
+  //       timeOut: 1000,
+  //       positionClass: 'toast-top-center',
+  //     });
+  //     console.log(res);
+  //   });
+  //   // saveAs(blob, '学生成绩表.xls');
+  // }
+  // 下载评分表
   downWordSheet(secretary: any) {
     // if (localStorage.getItem(secretary.sid)) {
     //   this.reply = JSON.parse(localStorage.getItem(secretary.sid));
     // }
-    if (!this.rep.reply.task || !this.rep.reply.technology ||
-      !this.rep.reply.language || !this.rep.reply.answer || !this.rep.reply.comments) {
-      this.rep.reply.task = secretary.grade.task;
-      this.rep.reply.technology = secretary.grade.technology;
-      this.rep.reply.language = secretary.grade.language;
-      this.rep.reply.answer = secretary.grade.answer;
-      this.rep.reply.comments = secretary.grade.comments;
+    if (!this.cookieService.get('userName')) {
+      this._toastrService.error('请先登录', '', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
+      return;
+    } else {
+      if (this.reply.id !== secretary.sid) {
+        this.reply.task = secretary.grade.task;
+        this.reply.technology = secretary.grade.technology;
+        this.reply.language = secretary.grade.language;
+        this.reply.answer = secretary.grade.answer;
+        this.reply.comments = secretary.grade.comments;
+      }
+      const sid = secretary.sid;
+      const sname = secretary.sname;
+      const cname = secretary.course.cname;
+      const replyGrade = secretary.grade.replyGrade;
+      console.log(this.cookieService.get('userName'));
+      this.data = `tname=${this.cookieService.get('userName')}&sid=${sid}&sname=${sname}&cname=${cname}
+     &task=${this.reply.task}&technology=${this.reply.technology}
+    &language=${this.reply.language}&answer=${this.reply.answer}&replyGrade=${replyGrade}
+   &comments=${this.reply.comments}`;
     }
-    const sid = secretary.sid;
-    const sname = secretary.sname;
-    const cname = secretary.course.cname;
-    const replyGrade = secretary.grade.replyGrade;
-    this.data = `sid=${sid}&sname=${sname}&cname=${cname}
-     &task=${this.rep.reply.task}&technology=${this.rep.reply.technology}
-    &language=${this.rep.reply.language}&answer=${this.rep.reply.answer}&replyGrade=${replyGrade}
-   &comments=${this.rep.reply.comments}`;
   }
 
+  // 下载评议书
   downWordReview(secretary: any, review: any) {
     const sid = secretary.sid;
     const sname = secretary.sname;
@@ -193,12 +226,6 @@ export class SecretaryComponent implements OnInit, OnDestroy {
     const total = (secretary.grade.advisorGrade * 0.4 + secretary.grade.reviewGrade * 0.2 + secretary.grade.replyGrade * 0.4)
       .toFixed(0);
     this.data = `sid=${sid}&sname=${sname}&cname=${cname}
-    &advisorGrade=${advisorGrade}&reviewGrade=${reviewGrade}
-    &replyGrade=${replyGrade}&total=${total}&review=${this.review}`;
-  }
-
-  // 页面销毁时，清除时间
-  ngOnDestroy(): void {
-    clearInterval(this.timer);
+    &advisorGrade=${advisorGrade}&reviewGrade=${reviewGrade}&replyGrade=${replyGrade}&total=${total}&review=${this.review}`;
   }
 }

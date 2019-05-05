@@ -12,7 +12,6 @@ export class WeekDayPipe implements PipeTransform {
       const week = weekArray[myDate.getDay()];
       return week;
     }
-    return null;
   }
 
 }

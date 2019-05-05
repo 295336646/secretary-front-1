@@ -1,9 +1,10 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {User} from '../../../home/user';
 import {HttpService} from '../../../service/http.service';
 import {Grade} from '../grade';
 import {HttpParams} from '@angular/common/http';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-reply-grade-modal',
@@ -20,15 +21,17 @@ export class ReplyGradeModalComponent implements OnInit {
     keyboard: false
   };
   reply: any = {
+    id: '',
     task: '',
     technology: '',
     language: '',
     answer: '',
     comments: ''
   };
+  @Output() outer = new EventEmitter();
   grade: Grade = new Grade();
 
-  constructor(private modalService: BsModalService, private http: HttpService) {
+  constructor(private modalService: BsModalService, private http: HttpService, private _toastrService: ToastrService) {
   }
 
   ngOnInit() {
@@ -37,9 +40,18 @@ export class ReplyGradeModalComponent implements OnInit {
   openModal(template: TemplateRef<any>) {
     const params = new HttpParams().set('sid', this.secretary.sid);
     this.http.getGrade(params).subscribe((res: any) => {
-      this.reply = res;
+      this.reply.task = res.task;
+      this.reply.technology = res.technology;
+      this.reply.language = res.language;
+      this.reply.answer = res.answer;
+      this.reply.comments = res.comments;
+      this.reply.id = this.secretary.sid;
     }, (error: any) => {
-      alert(error);
+      this._toastrService.error(error, '异常', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
     }, () => {
       this.modalRef = this.modalService.show(template, this.config);
     });
@@ -66,16 +78,53 @@ export class ReplyGradeModalComponent implements OnInit {
     this.grade.language = this.reply.language;
     this.grade.answer = this.reply.answer;
     this.grade.comments = this.reply.comments;
-    if (!this.reply.task || !this.reply.technology || !this.reply.language || !this.reply.answer || !this.reply.comments) {
-      alert('请填满!!!');
+    if (!this.reply.task || !this.reply.technology
+      || !this.reply.language || !this.reply.answer || !this.reply.comments) {
+      this._toastrService.error('评估不全', '', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
       return;
+    } else {
+      const pattern = /^\d{1,3}$/;
+      if (!pattern.test(this.reply.task) || !pattern.test(this.reply.technology)
+        || !pattern.test(this.reply.language) || !pattern.test(this.reply.answer)) {
+        this._toastrService.error('数据非法', '', {
+          closeButton: false,
+          timeOut: 1000,
+          positionClass: 'toast-top-center',
+        });
+        return;
+      } else {
+        if (this.reply.task > 30 || this.reply.task < 0
+          || this.reply.technology > 20 || this.reply.technology < 0
+          || this.reply.language > 20 || this.reply.language < 0
+          || this.reply.answer > 30 || this.reply.answer < 0) {
+          this._toastrService.error('数据非法', '', {
+            closeButton: false,
+            timeOut: 1000,
+            positionClass: 'toast-top-center',
+          });
+          return;
+        }
+      }
     }
     this.http.updateGrade(this.grade, this.secretary.sid).subscribe((res: any) => {
       if (res === true) {
-        alert('修改成功');
+        this._toastrService.success('修改成功', '', {
+          closeButton: false,
+          timeOut: 1000,
+          positionClass: 'toast-top-center',
+        });
+        this.outer.emit(this.reply);
       }
     }, (error: any) => {
-      alert(error);
+      this._toastrService.error(error, '异常', {
+        closeButton: false,
+        timeOut: 1000,
+        positionClass: 'toast-top-center',
+      });
     }, () => {
       this.modalRef.hide();
     });

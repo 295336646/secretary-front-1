@@ -1,69 +1,93 @@
-<div class="container">
-  <tabset>
-    <tab *ngFor="let group of groups;let i = index" [active]="i==0">
-      <ng-template tabHeading>
-        {{group}}
-        <button class="btn btn-danger btn-xs" (click)="romoveGroup(i)" id="remove">
-          <span class="glyphicon glyphicon-remove"></span>
-        </button>
-      </ng-template>
-      <app-teacher (outer)="getCheckTeacher($event)"></app-teacher>
-      <!--<app-student (outer)="getCheckStudents($event)"></app-student>-->
-      <button class="btn btn-success" (click)="submit(group)">提交</button>
-    </tab>
-    <tab>
-      <ng-template tabHeading>
-        <button class="btn btn-success btn-xs" (click)="addGroup()">
-          <span class="glyphicon glyphicon-plus"></span>
-        </button>
-      </ng-template>
-    </tab>
-  </tabset>
-  <br>
-  <button class="btn btn-success" (click)="exportTable()">导出</button>
-  <br>
-  <table class="table table-bordered table-hover" style="width: 90%" id="group">
-    <thead>
-    <tr>
-      <th>序号</th>
-      <th>所属班级</th>
-      <th>学生学号</th>
-      <th>学生姓名</th>
-      <th>教师工号</th>
-      <th>教师姓名</th>
-      <th>课题名称</th>
-      <th>评阅教师工号</th>
-      <th>评阅教师姓名</th>
-      <th>组号</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let stu of list;let i =index">
-      <td>{{i+1}}</td>
-      <td>{{stu.sclass}}</td>
-      <td>{{stu.sid}}</td>
-      <td>{{stu.sname}}</td>
-      <td>{{stu.teacher.tid}}</td>
-      <td>{{stu.teacher.tname}}</td>
-      <td>{{stu.course.cname}}</td>
-      <td>
-        <span *ngIf="stu.tjudge!=='0'">{{stu.tjudge}}</span>
-        <span *ngIf="stu.tjudge==='0'">暂未分配</span>
-      </td>
-      <td>
-        <span *ngIf="stu.tjudge!=='0'">{{stu.judge.teacher.tname}}</span>
-        <span *ngIf="stu.tjudge==='0'">暂未分配</span>
-      </td>
-      <td>
-        <span *ngIf=stu.sgroup>
-          {{stu.sgroup}}组
-        </span>
-        <span *ngIf=!stu.sgroup>
-         暂未分配
-        </span>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+<!--页面加载条-->
+<!--loading为true则显示，反之隐藏-->
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
+<div class="container-fluid" style="padding-top: 20px">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <table align="center" class="table table-bordered table-hover">
+        <thead>
+        <tr>
+          <th colspan="6" style="text-align: center; vertical-align: middle;" class="success">答辩分组管理</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">分组</td>
+          <td colspan="5" style="text-align: center; vertical-align: middle;">
+            <select class="selectpicker"
+                    data-live-search="true"
+                    (change)="getSelected(select.selectedOptions)"
+                    id="select"
+                    #select>
+              <option value="1">第1组</option>
+              <option value="2">第2组</option>
+              <option value="3">第3组</option>
+              <option value="4">第4组</option>
+              <option value="5">第5组</option>
+              <option value="6">第6组</option>
+              <option value="7">第7组</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">组长</td>
+          <td colspan="5" rowspan="1" style="text-align: center; vertical-align: middle;">
+            <select class="selectpicker"
+                    data-live-search="true"
+                    id="leader"
+                    #leader>
+              <option *ngFor="let teacher of teachers" [value]="teacher.tid">
+                {{teacher.tname}}
+              </option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">
+            <p><span style="background-color: transparent;">成员</span></p>
+          </td>
+          <td style="text-align: center; vertical-align: middle;">
+            <!--<span *ngFor="let g of groups | unique : 'tjudgename'">{{g.tjudgename}}-->
+            <!--</span> -->
+            <span *ngFor="let teacher of allocatedTeachers;let i = index">
+                 <input type="checkbox" [value]="teacher.tname" (click)="deleteTeacher(i,0)" checked>{{teacher.tname}}
+              <br *ngIf="(i+1)%7==0">
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; vertical-align: middle;">
+            <p><span style="background-color: transparent;">未分配成员</span></p>
+          </td>
+          <td style="text-align: center; vertical-align: middle;">
+            <!--<span *ngFor="let g of groups | unique : 'tjudgename'">{{g.tjudgename}}-->
+            <!--</span> -->
+            <span *ngFor="let teacher of unAllocatedTeachers;let i = index">
+                 <input type="checkbox" [value]="i" (click)="deleteTeacher(i,1)">{{teacher.tname}}
+              <br *ngIf="(i+1)%7==0">
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="6" style="text-align: center; vertical-align: middle;">
+            第 <span *ngIf="groupNum">{{groupNum}}</span>组
+            共有课题 <span *ngIf="groups">{{groups.length}}</span> 个
+          </td>
+        </tr>
+        <tr class="error">
+          <td colspan="6" style="text-align: center; vertical-align: middle;">
+            <div class="col-md-3 col-md-offset-3">
+              <button class="btn btn-primary" (click)="tSubmit(select.selectedOptions,leader.selectedOptions)">老师分组
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary" (click)="sSubmit()">学生分组
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
-
