@@ -1,0 +1,50 @@
+<img src="assets/images/main_03.jpg" alt="" width="100%">
+<!--整体div-->
+<div class="wrap">
+  <!-- 左边内容 -->
+  <div id="left" class="left">
+    <!--显示标题-->
+    <div id="logoDiv" class="logoDiv">
+      <p id="logoTitle" class="logoTitle">
+        <span style="font-size:18px;">教师端</span>
+      </p>
+    </div>
+    <!--显示用户信息-->
+    <div class="menu-title" id="personInfor">
+      <!--用户标签-->
+      <span class="glyphicon glyphicon-user" style="font-size: 20px">
+        <span style="margin-left: 10px">{{user.userName}}</span>
+      </span>
+      <br><br>
+      <button class="btn btn-primary btn-sm" (click)="logout()">退出登录</button>
+    </div>
+
+    <hr>
+    <br>
+
+    <div class="menu-title">教师</div>
+    <!--选项卡1-->
+    <div class="menu-item reply" href="#one" data-toggle="tab">
+      －选题管理
+    </div>
+  </div>
+
+  <!-- 右边内容 -->
+  <div id="right" class="tab-content right">
+
+    <!--显示时间-->
+    <div class="check-div form-inline">
+      <span>{{today | date : 'yyyy-MM-dd HH:mm:ss'}}</span>
+      <!--自定义星期管道，显示星期几-->
+      <span style="padding-left:2em;">{{today | weekDay}}</span>
+    </div>
+
+    <!--默认激活内容-->
+    <div id="one" class="tab-pane">
+      <!--<app-secretary [user]="user"></app-secretary>-->
+      <p>老师</p>
+    </div>
+
+  </div>
+</div>
+

@@ -31,13 +31,15 @@
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/bootstrap-select/dist/css/bootstrap-select.css",
-              "node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css"
+              "node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css",
+              "src/assets/css/login.css"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.js",
               "node_modules/bootstrap-select/dist/js/bootstrap-select.js",
-              "node_modules/bootstrap-switch/dist/js/bootstrap-switch.js"
+              "node_modules/bootstrap-switch/dist/js/bootstrap-switch.js",
+              "src/assets/js/phanimate.jquery.js"
             ]
           },
           "configurations": {

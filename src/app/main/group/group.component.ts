@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HttpService} from '../../service/http.service';
 import {User} from '../../home/user';
 import {ToastrService} from 'ngx-toastr';
@@ -19,8 +19,9 @@ export class GroupComponent implements OnInit {
   groups = new Array<Group>(); // 当前组员
   teachers = new Array<Teacher>();  // 所有老师
   groupNum = 1; // 初始组
-  unAllocatedTeachers = new Array<Teacher>(); // 存放未分配的老师
+  unAllocatedTeachers = new Array<Teacher>();
   allocatedTeachers = new Array<Teacher>(); // 存放已分配的老师
+  temp = new Array<Teacher>(); // 存放临时分组
   currentLeaderId: string;  // 记录当前组长id
   currentLeaderName: string; // 记录当前组长姓名
   interval: any;
@@ -69,6 +70,7 @@ export class GroupComponent implements OnInit {
       this.unAllocatedTeachers = this.teachers.filter(function (item) {
         return item.tgroup === 0;
       });
+      this.httpService.unAllocatedTeachers = this.unAllocatedTeachers;
     });
   }
 
@@ -104,21 +106,22 @@ export class GroupComponent implements OnInit {
 
   deleteTeacher(i: number, state: number) {
     if (state === 0) {
-      this.unAllocatedTeachers.push(this.allocatedTeachers[i]);
+      this.httpService.unAllocatedTeachers.push(this.allocatedTeachers[i]);
       this.allocatedTeachers.splice(i, 1);
     }
     if (state === 1) {
-      this.allocatedTeachers.push(this.unAllocatedTeachers[i]);
-      this.unAllocatedTeachers.splice(i, 1);
+      this.temp.push(this.httpService.unAllocatedTeachers[i]);
+      this.allocatedTeachers.push(this.httpService.unAllocatedTeachers[i]);
+      this.httpService.unAllocatedTeachers.splice(i, 1);
     }
   }
 
-  tSubmit(op: any, leaderOp: any) {
+  submit(op: any, leaderOp: any) {
     this.loading = true;
     this.groupNum = op[0].value;
     const NewLeader = leaderOp[0].value;
-    const teachers = {allocated: this.allocatedTeachers, unallocated: this.unAllocatedTeachers};
-    this.httpService.dividedTeacher(this.groupNum, this.currentLeaderId, NewLeader, teachers).subscribe((res: any) => {
+    const teachers = {allocated: this.allocatedTeachers, unallocated: this.httpService.unAllocatedTeachers};
+    this.httpService.dividedGroup(this.groupNum, this.currentLeaderId, NewLeader, teachers).subscribe((res: any) => {
       if (res === true) {
         this._toastrService.success('分组成功', '', {
           closeButton: false,
@@ -126,7 +129,6 @@ export class GroupComponent implements OnInit {
           positionClass: 'toast-top-center',
         });
       } else {
-        this.getUnAllocatedTeachers();
         this._toastrService.error('分组失败', '', {
           closeButton: false,
           timeOut: 1000,
@@ -145,34 +147,4 @@ export class GroupComponent implements OnInit {
       this.getGroup(params);
     });
   }
-
-  sSubmit() {
-    this.loading = true;
-    this.httpService.dividedGroup().subscribe((res: any) => {
-      if (res === true) {
-        this._toastrService.success('分组成功', '', {
-          closeButton: false,
-          timeOut: 1000,
-          positionClass: 'toast-top-center',
-        });
-      } else {
-        this._toastrService.error('分组失败', '', {
-          closeButton: false,
-          timeOut: 1000,
-          positionClass: 'toast-top-center',
-        });
-      }
-    }, (error: any) => {
-      this._toastrService.error(error, '异常', {
-        closeButton: false,
-        timeOut: 1000,
-        positionClass: 'toast-top-center',
-      });
-    }, () => {
-      this.loading = false;
-      const params = new HttpParams().set('groupNum', '' + this.groupNum);
-      this.showGroup(params);
-    });
-  }
-
 }

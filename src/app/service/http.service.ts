@@ -5,6 +5,7 @@ import {ConfigService} from './config.service';
 import {catchError} from 'rxjs/operators';
 import {Grade} from '../main/secretary/grade';
 import {RequestOptions} from '@angular/http';
+import {Teacher} from '../main/group/Teacher';
 
 const headers = new HttpHeaders().set(
   'Content-type',
@@ -19,7 +20,7 @@ const headers = new HttpHeaders().set(
 })
 export class HttpService {
   Url = '/cl'; // 服务器访问地址
-
+  unAllocatedTeachers = new Array<Teacher>(); // 存放未分配的老师
   constructor(private http: HttpClient, private config: ConfigService) {
   }
 
@@ -35,7 +36,7 @@ export class HttpService {
 
   // 获取答辩表
   reply(params: HttpParams): Observable<any> {
-    return this.http.get(`${this.Url}/reply`, {params}).pipe(catchError(this.config.handleError));
+    return this.http.get(`${this.Url}/likeGrade`, {params}).pipe(catchError(this.config.handleError));
   }
 
   // 修改答辩表
@@ -49,7 +50,7 @@ export class HttpService {
     return this.http.put(`${this.Url}/updatePass/${uid}`, null, {params}).pipe(catchError(this.config.handleError));
   }
 
-  // 分组
+  // 查看分组
   showGroup(params: HttpParams): Observable<any> {
     return this.http.get(`${this.Url}/showGroup`, {params}).pipe(catchError(this.config.handleError));
   }
@@ -75,14 +76,15 @@ export class HttpService {
       data, {headers}).pipe(catchError(this.config.handleError));
   }
 
+  // 分组
+  dividedGroup(groupNum: number, currentLeader: string, leader: string, data: any): Observable<any> {
+    return this.http.put(`${this.Url}/dividedGroup/${groupNum}/${currentLeader}/${leader}`,
+      data, {headers}).pipe(catchError(this.config.handleError));
+  }
+
   // 学生
   showStudents(): Observable<any> {
     return this.http.get(`${this.Url}/showStudents`).pipe(catchError(this.config.handleError));
-  }
-
-  // 分组
-  dividedGroup(): Observable<any> {
-    return this.http.put(`${this.Url}/dividedGroup`, null).pipe(catchError(this.config.handleError));
   }
 
   // 更新成绩
@@ -95,7 +97,8 @@ export class HttpService {
     return this.http.get(`${this.Url}/getGrade`, {params}).pipe(catchError(this.config.handleError));
   }
 
-  logOut(): Observable<any> {
-    return this.http.get(`${this.Url}/logOut`).pipe(catchError(this.config.handleError));
+  logOut(uid: string): Observable<any> {
+    const params = new HttpParams().set('uid', uid);
+    return this.http.get(`${this.Url}/logOut`, {params}).pipe(catchError(this.config.handleError));
   }
 }

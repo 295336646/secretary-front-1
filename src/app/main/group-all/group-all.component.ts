@@ -1,7 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {HttpService} from '../../service/http.service';
 import {HttpParams} from '@angular/common/http';
 import {PageInfo} from '../secretary/PageInfo';
+import {Teacher} from '../group/Teacher';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-group-all',
@@ -10,8 +12,9 @@ import {PageInfo} from '../secretary/PageInfo';
 })
 export class GroupAllComponent implements OnInit {
   pageInfo: PageInfo = new PageInfo(); // 分页信息
+  down = 'javascript:void(0);';
 
-  constructor(private httpService: HttpService) {
+  constructor(private httpService: HttpService, private _toastrService: ToastrService) {
     this.pageInfo.firstPage = '1'; // 初始页为第一页
   }
 
@@ -60,10 +63,23 @@ export class GroupAllComponent implements OnInit {
     this.getGroup(params);
     return false;
   }
+
 // 跳转末页
   getLastPage() {
     const params = new HttpParams().set('pn', this.pageInfo.lastPage);
     this.getGroup(params);
     return false;
+  }
+
+  checkUnallocated() {
+    if (this.httpService.unAllocatedTeachers.length !== 0) {
+      this._toastrService.error('请先分配好老师，再导出', '', {
+        closeButton: false,
+        timeOut: 3000,
+        positionClass: 'toast-top-center',
+      });
+    } else {
+      this.down = 'http://localhost:8081/graduation/cl/downExcelSheet';
+    }
   }
 }

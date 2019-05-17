@@ -28,6 +28,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ToastContainerModule, ToastrModule} from 'ngx-toastr';
 import {CookieService} from 'ngx-cookie-service';
 import { GroupAllComponent } from './main/group-all/group-all.component';
+import { StudentComponent } from './student/student.component';
+import { TeacherComponent } from './teacher/teacher.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +46,8 @@ import { GroupAllComponent } from './main/group-all/group-all.component';
     MarkSheetComponent,
     MarkReviewComponent,
     GroupAllComponent,
+    StudentComponent,
+    TeacherComponent,
   ],
   imports: [
     BrowserModule,

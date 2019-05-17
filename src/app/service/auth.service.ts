@@ -13,6 +13,7 @@ export class AuthService {
   // 检测是否已经登录
   checkLogin(url: string): boolean {
     if (this.cookieService.get('userId')) {
+      console.log(this.cookieService.get('userId'));
       return true;
     }
     // 未登录成功，则不允许直接访问主页面，直接跳转至初始界面

@@ -6,6 +6,8 @@ import {User} from '../user';
 import {ToastrService} from 'ngx-toastr';
 import {CookieService} from 'ngx-cookie-service';
 
+declare var $: any;
+
 // 正则表达式验证用户ID是否是3-13位数字
 function userIdValidator(control: FormControl): { [s: string]: boolean } {
   if (!control.value.match(/^\d{3,13}$/)) {
@@ -43,11 +45,18 @@ export class HomeFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    $(() => {
+      $('#login #login-password').focus(() => {
+        $('.login-owl').addClass('password');
+      }).blur(() => {
+        $('.login-owl').removeClass('password');
+      });
+    });
     this.change();
     this.Form = this.fb.group({
       'uid': ['', Validators.required],
       'password': ['', Validators.required],
-      'role': ['2']
+      'role': ['0']
     });
   }
 
@@ -71,20 +80,10 @@ export class HomeFormComponent implements OnInit {
   // 验证验证码和身份
   check() {
     const inputCode = this.input.toUpperCase();
-    // console.log(this.Form.get('role').value);
     if (this.uid.invalid || this.password.invalid) {
       this._toastrService.error('用户名或密码不能为空', '', {
         closeButton: false,
         // disableTimeOut: true,
-        timeOut: 1000,
-        positionClass: 'toast-top-center',
-      });
-      this.change();
-      return false;
-    }
-    if (this.role.value !== '2') {
-      this._toastrService.error('登录身份必须是秘书', '', {
-        closeButton: false,
         timeOut: 1000,
         positionClass: 'toast-top-center',
       });
@@ -137,18 +136,26 @@ export class HomeFormComponent implements OnInit {
         // this.user.userName = res.extend.userName;
         this.user.role = Number.parseInt(data.role, 10);
         // 存储用户名并带用户id路由跳转
+        if (this.user.role === 0) {
+          this.cookieService.set('userName', res.extend.userName, new Date(new Date().getTime() + this.time));
+          this.cookieService.set('userId', data.uid, new Date(new Date().getTime() + this.time));
+          this.router.navigate(['/student', {uid: this.user.uid}]);
+        }
+        if (this.user.role === 1) {
+          this.cookieService.set('userName', res.extend.userName, new Date(new Date().getTime() + this.time));
+          this.cookieService.set('userId', data.uid, new Date(new Date().getTime() + this.time));
+          this.router.navigate(['/teacher', {uid: this.user.uid}]);
+        }
+        // 存储用户名并带用户id路由跳转
         if (this.user.role === 2) {
-          // sessionStorage.setItem('name', this.user.userName);
           this.cookieService.set('userName', res.extend.userName, new Date(new Date().getTime() + this.time));
           this.cookieService.set('userId', data.uid, new Date(new Date().getTime() + this.time));
           this.router.navigate(['/main', {uid: this.user.uid}]);
-          // this.router.navigate(['/main', {uid: this.user.uid}], {replaceUrl: true, skipLocationChange: true});
         }
         // this.router.navigate(['/main']);
         // skipLocationChange设为true路由跳转时浏览器中的url会保持不变，但是传入的参数依然有效
         // this.router.navigate(['/main', {uid: this.user.uid}], {replaceUrl: true, skipLocationChange: true});
       }, (error) => {
-        // sessionStorage.removeItem('name');
         this.loading = false;
         alert(error);
       }, () => {

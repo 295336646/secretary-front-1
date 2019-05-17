@@ -1,4 +1,4 @@
-<img src="assets/main_03.jpg" alt="" width="100%">
+<img src="assets/images/main_03.jpg" alt="" width="100%">
 <!--整体div-->
 <div class="wrap">
   <!-- 左边内容 -->
@@ -35,8 +35,11 @@
     <div class="menu-item manage" href="#three" data-toggle="tab">
       －分组管理
     </div>
-    <!--选项卡4-->
     <div class="menu-item manage" href="#four" data-toggle="tab">
+
+    </div>
+    <!--选项卡4-->
+    <div class="menu-item manage" href="#five" data-toggle="tab">
       －修改密码
     </div>
   </div>
@@ -57,16 +60,20 @@
     </div>
     <!--待激活内容-->
     <div id="two" class="tab-pane">
-                             <!--<span style="text-shadow: 2px 0px 6px">-->
-                               <!--<app-file [user]="user" [users]="users"></app-file>-->
-                            <!--</span>-->
+      <!--<span style="text-shadow: 2px 0px 6px">-->
+      <!--<app-file [user]="user" [users]="users"></app-file>-->
+      <!--</span>-->
       <app-group-all></app-group-all>
     </div>
     <div id="three" class="tab-pane">
-      <app-group [user]="user"></app-group>
+      <app-group [user]="user" (outer)="getUnallocated($event)"></app-group>
     </div>
     <!--待激活内容-->
     <div id="four" class="tab-pane">
+      <app-update [user]="user"></app-update>
+    </div>
+    <!--待激活内容-->
+    <div id="five" class="tab-pane">
       <app-update [user]="user"></app-update>
     </div>
 
@@ -80,16 +87,13 @@
       </p>
     </div>
 
-    <div id="role" class="row" style="margin-left: 30%">
-      <div class="bootstrap-switch bootstrap-switch-large">
-        <input type="checkbox" id="toggle" checked />
+    <div id="role" class="row" style="margin-left: 10%;margin-top: 10%">
+      <div class="col-md-1">
+        <img src="assets/images/review.png" (click)="reply()">
       </div>
-      <!--<div class="col-md-1 col-md-offset-5">-->
-        <!--<button class="btn btn-primary" (click)="reply()">答辩秘书</button>-->
-      <!--</div>-->
-      <!--<div class="col-md-1">-->
-        <!--<button class="btn btn-primary" (click)="manage()">管理秘书</button>-->
-      <!--</div>-->
+      <div class="col-md-1 col-lg-offset-3">
+        <img src="assets/images/manager.png" (click)="manage()">
+      </div>
     </div>
 
   </div>

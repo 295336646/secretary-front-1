@@ -47,8 +47,6 @@
             <p><span style="background-color: transparent;">成员</span></p>
           </td>
           <td style="text-align: center; vertical-align: middle;">
-            <!--<span *ngFor="let g of groups | unique : 'tjudgename'">{{g.tjudgename}}-->
-            <!--</span> -->
             <span *ngFor="let teacher of allocatedTeachers;let i = index">
                  <input type="checkbox" [value]="teacher.tname" (click)="deleteTeacher(i,0)" checked>{{teacher.tname}}
               <br *ngIf="(i+1)%7==0">
@@ -60,8 +58,6 @@
             <p><span style="background-color: transparent;">未分配成员</span></p>
           </td>
           <td style="text-align: center; vertical-align: middle;">
-            <!--<span *ngFor="let g of groups | unique : 'tjudgename'">{{g.tjudgename}}-->
-            <!--</span> -->
             <span *ngFor="let teacher of unAllocatedTeachers;let i = index">
                  <input type="checkbox" [value]="i" (click)="deleteTeacher(i,1)">{{teacher.tname}}
               <br *ngIf="(i+1)%7==0">
@@ -74,14 +70,10 @@
             共有课题 <span *ngIf="groups">{{groups.length}}</span> 个
           </td>
         </tr>
-        <tr class="error">
+        <tr>
           <td colspan="6" style="text-align: center; vertical-align: middle;">
-            <div class="col-md-3 col-md-offset-3">
-              <button class="btn btn-primary" (click)="tSubmit(select.selectedOptions,leader.selectedOptions)">老师分组
-              </button>
-            </div>
-            <div class="col-md-3">
-              <button class="btn btn-primary" (click)="sSubmit()">学生分组
+            <div class="col-md-3 col-md-offset-5">
+              <button class="btn btn-primary" (click)="submit(select.selectedOptions,leader.selectedOptions)">提交分组
               </button>
             </div>
           </td>

@@ -1,11 +1,13 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import * as $ from 'jquery';
+import {Component, Input, OnInit} from '@angular/core';
 import {HttpService} from '../../service/http.service';
 import {User} from '../../home/user';
 import {PageInfo} from './PageInfo';
 import {HttpParams} from '@angular/common/http';
 import {ToastrService} from 'ngx-toastr';
 import {CookieService} from 'ngx-cookie-service';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+
+declare var $: any;
 
 @Component({
   selector: 'app-secretary',
@@ -19,7 +21,7 @@ export class SecretaryComponent implements OnInit {
   total: string;  // 保存总分
   review: string; // 标记该学生成绩等第
   data: any; // 保留上传的数据
-  down = 'http://localhost:8080/cl/';
+  down = 'http://localhost:8081/graduation/cl/';
   downAddress: Array<string> = ['downWordSheet?', 'downWordReview?'];
   // 记录当前修改成绩表
   reply: any = {
@@ -30,12 +32,29 @@ export class SecretaryComponent implements OnInit {
     answer: '',
     comments: ''
   };
+  Form: FormGroup;
 
-  constructor(private http: HttpService, private _toastrService: ToastrService, private cookieService: CookieService) {
+  constructor(private http: HttpService, private _toastrService: ToastrService,
+              private fb: FormBuilder, private cookieService: CookieService) {
     this.pageInfo.firstPage = '1';
+    this.Form = this.fb.group({
+      'sid': [''],
+      'sname': [''],
+      'generalComments': ['']
+    });
   }
 
   ngOnInit() {
+    $(() => {
+      $('.custom-input input').phAnim();
+    });
+    this.Form.valueChanges.subscribe(
+      (form: any) => {
+        const param = new HttpParams().set('pn', this.pageInfo.firstPage)
+          .set('sid', form['sid']).set('sname', form['sname']).set('generalComments', form['generalComments']);
+        this.getReview(param);
+      }
+    );
     const params = new HttpParams().set('pn', this.pageInfo.firstPage);
     this.getReview(params);
   }
@@ -64,31 +83,46 @@ export class SecretaryComponent implements OnInit {
   }
 
   getPage(page_Num: string) {
-    const params = new HttpParams().set('pn', page_Num);
+    const params = new HttpParams().set('pn', page_Num)
+      .set('sid', this.Form.value['sid'])
+      .set('sname', this.Form.value['sname'])
+      .set('generalComments', this.Form.value['generalComments']);
     this.getReview(params);
     return false;
   }
 
   getFirstPage() {
-    const params = new HttpParams().set('pn', this.pageInfo.firstPage);
+    const params = new HttpParams().set('pn', this.pageInfo.firstPage)
+      .set('sid', this.Form.value['sid'])
+      .set('sname', this.Form.value['sname'])
+      .set('generalComments', this.Form.value['generalComments']);
     this.getReview(params);
     return false;
   }
 
   getPreviousPage() {
-    const params = new HttpParams().set('pn', (this.pageInfo.pageNum - 1).toString());
+    const params = new HttpParams().set('pn', (this.pageInfo.pageNum - 1).toString())
+      .set('sid', this.Form.value['sid'])
+      .set('sname', this.Form.value['sname'])
+      .set('generalComments', this.Form.value['generalComments']);
     this.getReview(params);
     return false;
   }
 
   getNextPage() {
-    const params = new HttpParams().set('pn', (this.pageInfo.pageNum + 1).toString());
+    const params = new HttpParams().set('pn', (this.pageInfo.pageNum + 1).toString())
+      .set('sid', this.Form.value['sid'])
+      .set('sname', this.Form.value['sname'])
+      .set('generalComments', this.Form.value['generalComments']);
     this.getReview(params);
     return false;
   }
 
   getLastPage() {
-    const params = new HttpParams().set('pn', this.pageInfo.lastPage);
+    const params = new HttpParams().set('pn', this.pageInfo.lastPage)
+      .set('sid', this.Form.value['sid'])
+      .set('sname', this.Form.value['sname'])
+      .set('generalComments', this.Form.value['generalComments']);
     this.getReview(params);
     return false;
   }
@@ -207,7 +241,6 @@ export class SecretaryComponent implements OnInit {
       const sname = secretary.sname;
       const cname = secretary.course.cname;
       const replyGrade = secretary.grade.replyGrade;
-      console.log(this.cookieService.get('userName'));
       this.data = `tname=${this.cookieService.get('userName')}&sid=${sid}&sname=${sname}&cname=${cname}
      &task=${this.reply.task}&technology=${this.reply.technology}
     &language=${this.reply.language}&answer=${this.reply.answer}&replyGrade=${replyGrade}

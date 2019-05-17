@@ -4,6 +4,7 @@ import {User} from '../home/user';
 import {CookieService} from 'ngx-cookie-service';
 import {HttpService} from '../service/http.service';
 import {ToastrService} from 'ngx-toastr';
+import {Teacher} from './group/Teacher';
 
 declare var $: any;
 
@@ -20,8 +21,8 @@ export class MainComponent implements OnInit {
     backdrop: 'static',
     keyboard: false
   };
-  role = '';
-
+  role = '答辩秘书';
+  unAllocatedTeachers = new Array<Teacher>(); // 存放未分配的老师
   constructor(private router: Router, private route: ActivatedRoute,
               private cookieService: CookieService,
               private httpService: HttpService,
@@ -34,22 +35,6 @@ export class MainComponent implements OnInit {
   }
 
   ngOnInit() {
-    $('#toggle').bootstrapSwitch({
-      onText: '管理秘书',
-      offText: '答辩秘书',
-      onColor: 'success',
-      offColor: 'info',
-      labelText: '秘书',
-      onInit: (event, state) => {
-        this.reply();
-      }, onSwitchChange: (event, state) => {
-        if (state === true) {
-          this.manage();
-        } else {
-          this.reply();
-        }
-      }
-    });
     // 接收路由参数
     this.route.params.subscribe((params: Params) => {
       this.user.uid = params['uid'];
@@ -88,7 +73,7 @@ export class MainComponent implements OnInit {
 
   // 登出，清除信息并跳转至初始页面
   logout() {
-    this.httpService.logOut().subscribe((res: any) => {
+    this.httpService.logOut(this.user.uid).subscribe((res: any) => {
       if (res === true) {
         this.cookieService.deleteAll();
       }
@@ -101,6 +86,10 @@ export class MainComponent implements OnInit {
     }, () => {
       this.router.navigate(['/home']);
     });
+  }
+
+  getUnallocated(e: any) {
+    this.unAllocatedTeachers = e;
   }
 }
 
